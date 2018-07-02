@@ -288,10 +288,10 @@ function set_sudo_group ()
 {
     case "${DISTRO}" in
         centos?|fedora??|*-atomic|amazon? )
-            SUDOGROUP="wheel"
+            export SUDOGROUP="wheel"
             ;;
         ubuntu*|debian? )
-            SUDOGROUP="sudo"
+            export SUDOGROUP="sudo"
             ;;
         *)
             die "OS not supported."
@@ -303,10 +303,10 @@ function set_cloud_init_remove ()
 {
     case "${DISTRO}" in
         centos7|amazon?|fedora??|ubuntu*|debian? )
-            CLOUDINITDISABLE="systemctl disable cloud-init.service"
+            export CLOUDINITDISABLE="systemctl disable cloud-init.service"
             ;;
         *-atomic)
-            CLOUDINITDISABLE="/usr/bin/true"
+            export CLOUDINITDISABLE="/usr/bin/true"
             ;;
     esac
 }
@@ -314,9 +314,9 @@ function set_cloud_init_remove ()
 function set_network_restart_cmd ()
 {
     case "${DISTRO}" in
-        centos6 )           NETRESTART="service network stop && service network start" ;;
-        ubuntu*|debian?)    NETRESTART="systemctl stop networking && systemctl start networking" ;;
-        *)                  NETRESTART="systemctl stop network && systemctl start network" ;;
+        centos6 )           export NETRESTART="service network stop && service network start" ;;
+        ubuntu*|debian?)    export NETRESTART="systemctl stop networking && systemctl start networking" ;;
+        *)                  export NETRESTART="systemctl stop network && systemctl start network" ;;
     esac
 }
 
@@ -629,7 +629,7 @@ function create ()
         printf "Run 'kvm-install-vm help create' for usage.\n"
         exit 1
     else
-        VMNAME=$1
+        export VMNAME=$1
     fi
 
     # Set cloud-init variables after VMNAME is assigned
