@@ -4,7 +4,7 @@ A bash wrapper around virt-install to build virtual machines on a local KVM
 hypervisor.  You can run it as a normal user which will use `qemu:///session` to
 connect locally to your KVM domains.
 
-Tested on Fedora 27.
+Adapted to work specifically for my own personal use-cases
 
 ### Prerequisites
 
@@ -12,21 +12,10 @@ You need to have the KVM hypervisor installed, along with a few other packages:
 
 - genisoimage or mkisofs
 - virt-install
-- libguestfs-tools-c
+- libguestfs-tools
 - qemu-img
 - libvirt-client
-
-To install the dependencies, run:
-
-```
-sudo dnf -y install genisoimage virt-install libguestfs-tools-c qemu-img libvirt-client wget
-```
-
-If you want to resolve guests by their hostnames, install the `libvirt-nss` package:
-
-```
-sudo dnf -y install libvirt-nss
-```
+- libnss-libvirt
 
 Then, add `libvirt` and `libvirt_guest` to list of **hosts** databases in
 `/etc/nsswitch.conf`.  See [here](https://libvirt.org/nss.html) for more
@@ -67,12 +56,12 @@ DESCRIPTION
 
 OPTIONS
     -a          Autostart           (default: false)
-    -b          Bridge              (default: virbr0)
+    -b          Bridge              (default: br0)
     -c          Number of vCPUs     (default: 1)
     -d          Disk Size (GB)      (default: 10)
-    -D          DNS Domain          (default: example.local)
+    -D          DNS Domain          (default: crypticmonsters.com)
     -f          CPU Model / Feature (default: host)
-    -g          Graphics type       (default: spice)
+    -g          Graphics type       (default: vnc)
     -h          Display help
     -i          Custom QCOW2 Image
     -k          SSH Public Key      (default: $HOME/.ssh/id_rsa.pub)
@@ -82,23 +71,14 @@ OPTIONS
     -p          Console port        (default: auto)
     -s          Custom shell script
     -t          Linux Distribution  (default: centos7)
-    -T          Timezone            (default: US/Eastern)
+    -T          Timezone            (default: Europe/Dublin)
     -u          Custom user         (defualt: $USER)
     -v          Be verbose
 
 DISTRIBUTIONS
     NAME            DESCRIPTION                         LOGIN
-    amazon2         Amazon Linux 2                      ec2-user
     centos7         CentOS 7                            centos
     centos7-atomic  CentOS 7 Atomic Host                centos
-    centos6         CentOS 6                            centos
-    debian9         Debian 9 (Stretch)                  debian
-    fedora26        Fedora 26                           fedora
-    fedora26-atomic Fedora 26 Atomic Host               fedora
-    fedora27        Fedora 27                           fedora
-    fedora27-atomic Fedora 27 Atomic Host               fedora
-    fedora28        Fedora 28                           fedora
-    fedora28-atomic Fedora 28 Atomic Host               fedora
     ubuntu1604      Ubuntu 16.04 LTS (Xenial Xerus)     ubuntu
 
 EXAMPLES
@@ -178,33 +158,7 @@ Options are evaluated in the following order:
 - Custom options set in `.kivrc`
 - Option flags set on the command line
 
-### Notes
-
-1. This script will download a qcow2 cloud image from the respective
-   distribution's download site.  See script for URLs.
-
-2. If using libvirt-nss, keep in mind that DHCP leases take some time to
-   expire, so if you create a VM, delete it, and recreate another VM with the
-   same name in a short period of time, there will be two DHCP leases for the
-   same host and its hostname will likely not resolve until the old lease
-   expires.
-
 ### Testing
 
 Tests are written using [Bats](https://github.com/sstephenson/bats).  To
 execute the tests, run `./test.sh` in the root directory of the project.
-
-### Use Cases
-
-If you don't need to use Docker or Vagrant, don't want to make changes to a
-production machine, or just want to spin up one or more VMs locally to test
-things like:
-
-- high availability
-- clustering
-- package installs
-- preparing for exams
-- checking for system defaults
-- anything else you would do with a VM
-
-...then this wrapper could be useful for you.

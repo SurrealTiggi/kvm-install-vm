@@ -45,39 +45,30 @@ function usage_subcommand ()
             printf "    help - show this help\n"
             printf "\n"
             printf "OPTIONS\n"
-            printf "    -a          Autostart           (default: false)\n"
-            printf "    -b          Bridge              (default: virbr0)\n"
+            printf "    -a          Autostart           (default: true)\n"
+            printf "    -b          Bridge              (default: br0)\n"
             printf "    -c          Number of vCPUs     (default: 1)\n"
             printf "    -d          Disk Size (GB)      (default: 10)\n"
-            printf "    -D          DNS Domain          (default: example.local)\n"
+            printf "    -D          DNS Domain          (default: crypticmonsters.com)\n"
             printf "    -f          CPU Model / Feature (default: host)\n"
-            printf "    -g          Graphics type       (default: spice)\n"
+            printf "    -g          Graphics type       (default: vnc)\n"
             printf "    -h          Display help\n"
             printf "    -i          Custom QCOW2 Image\n"
             printf "    -k          SSH Public Key      (default: $HOME/.ssh/id_rsa.pub)\n"
-            printf "    -l          Location of Images  (default: $HOME/virt/images)\n"
+            printf "    -l          Location of Images  (default: /var/lib/libvirt/images)\n"
             printf "    -m          Memory Size (MB)    (default: 1024)\n"
             printf "    -M mac      Mac address         (default: auto-assigned)\n"
             printf "    -p          Console port        (default: auto)\n"
             printf "    -s          Custom shell script\n"
             printf "    -t          Linux Distribution  (default: centos7)\n"
-            printf "    -T          Timezone            (default: US/Eastern)\n"
+            printf "    -T          Timezone            (default: Europe/Dublin)\n"
             printf "    -u          Custom user         (default: $USER)\n"
             printf "    -v          Be verbose\n"
             printf "\n"
             printf "DISTRIBUTIONS\n"
             printf "    NAME            DESCRIPTION                         LOGIN\n"
-            printf "    amazon2         Amazon Linux 2                      ec2-user\n"
             printf "    centos7         CentOS 7                            centos\n"
             printf "    centos7-atomic  CentOS 7 Atomic Host                centos\n"
-            printf "    centos6         CentOS 6                            centos\n"
-            printf "    debian9         Debian 9 (Stretch)                  debian\n"
-            printf "    fedora26        Fedora 26                           fedora\n"
-            printf "    fedora26-atomic Fedora 26 Atomic Host               fedora\n"
-            printf "    fedora27        Fedora 27                           fedora\n"
-            printf "    fedora27-atomic Fedora 27 Atomic Host               fedora\n"
-            printf "    fedora28        Fedora 28                           fedora\n"
-            printf "    fedora28-atomic Fedora 28 Atomic Host               fedora\n"
             printf "    ubuntu1604      Ubuntu 16.04 LTS (Xenial Xerus)     ubuntu\n"
             printf "\n"
             printf "EXAMPLES\n"
@@ -220,12 +211,6 @@ function fetch_images ()
     # Set variables based on $DISTRO
     # Use the command "osinfo-query os" to get the list of the accepted OS variants.
     case "$DISTRO" in
-        amazon2)
-            QCOW=amzn2-kvm-2017.12.0.20171212.2-x86_64.xfs.gpt.qcow2
-            OS_VARIANT="auto"
-            IMAGE_URL=https://cdn.amazonlinux.com/os-images/2017.12.0.20171212.2/kvm
-            LOGIN_USER=ec2-user
-            ;;
         centos7)
             QCOW=CentOS-7-x86_64-GenericCloud.qcow2
             OS_VARIANT="centos7.0"
@@ -238,61 +223,6 @@ function fetch_images ()
             IMAGE_URL=http://cloud.centos.org/centos/7/atomic/images
             LOGIN_USER=centos
             ;;
-        centos6)
-            QCOW=CentOS-6-x86_64-GenericCloud.qcow2
-            OS_VARIANT="centos6.9"
-            IMAGE_URL=https://cloud.centos.org/centos/6/images
-            LOGIN_USER=centos
-            ;;
-        debian8)
-            # FIXME: Not yet working.
-            QCOW=debian-8-openstack-amd64.qcow2
-            OS_VARIANT="debian8"
-            IMAGE_URL=https://cdimage.debian.org/cdimage/openstack/current-8
-            LOGIN_USER=debian
-            ;;
-        debian9)
-            QCOW=debian-9-openstack-amd64.qcow2
-            OS_VARIANT="debian9"
-            IMAGE_URL=https://cdimage.debian.org/cdimage/openstack/current-9
-            LOGIN_USER=debian
-            ;;
-        fedora26)
-            QCOW=Fedora-Cloud-Base-26-1.5.x86_64.qcow2
-            OS_VARIANT="fedora26"
-            IMAGE_URL=https://download.fedoraproject.org/pub/fedora/linux/releases/26/CloudImages/x86_64/images
-            LOGIN_USER=fedora
-            ;;
-        fedora26-atomic)
-            QCOW=Fedora-Atomic-26-20171003.0.x86_64.qcow2
-            OS_VARIANT="fedora26"
-            IMAGE_URL=https://download.fedoraproject.org/pub/alt/atomic/stable/Fedora-Atomic-26-20171003.0/CloudImages/x86_64/images
-            LOGIN_USER=fedora
-            ;;
-        fedora27)
-            QCOW=Fedora-Cloud-Base-27-1.6.x86_64.qcow2
-            OS_VARIANT="fedora27"
-            IMAGE_URL=https://download.fedoraproject.org/pub/fedora/linux/releases/27/CloudImages/x86_64/images
-            LOGIN_USER=fedora
-            ;;
-        fedora27-atomic)
-            QCOW=Fedora-Atomic-27-1.6.x86_64.qcow2
-            OS_VARIANT="fedora27"
-            IMAGE_URL=https://download.fedoraproject.org/pub/fedora/linux/releases/27/CloudImages/x86_64/images
-            LOGIN_USER=fedora
-            ;;
-        fedora28)
-          QCOW=Fedora-Cloud-Base-28-1.1.x86_64.qcow2
-          OS_VARIANT="fedora27"
-          IMAGE_URL=https://download.fedoraproject.org/pub/fedora/linux/releases/28/Cloud/x86_64/images
-          LOGIN_USER=fedora
-          ;;
-        fedora28-atomic)
-          QCOW=Fedora-AtomicHost-28-20180425.0.x86_64.qcow2
-          OS_VARIANT="fedora27"
-          IMAGE_URL=https://download.fedoraproject.org/pub/alt/atomic/stable/Fedora-Atomic-28-20180425.0/AtomicHost/x86_64/images
-          LOGIN_USER=fedora
-          ;;
         ubuntu1604)
             QCOW=ubuntu-16.04-server-cloudimg-amd64-disk1.img
             OS_VARIANT="ubuntu16.04"
@@ -662,22 +592,22 @@ function remove ()
 function set_defaults ()
 {
     # Defaults are set here. Override using command line arguments.
-    CPUS=1                          # Number of virtual CPUs
-    FEATURE=host                    # Use host cpu features to the guest
-    MEMORY=1024                     # Amount of RAM in MB
-    DISK_SIZE=""                    # Disk Size in GB
-    DNSDOMAIN=example.local         # DNS domain
-    GRAPHICS=spice                  # Graphics type
-    RESIZE_DISK=false               # Resize disk (boolean)
-    IMAGEDIR=${HOME}/virt/images    # Directory to store images
-    BRIDGE=virbr0                   # Hypervisor bridge
-    PUBKEY=""                       # SSH public key
-    DISTRO=centos7                  # Distribution
-    MACADDRESS=""                   # MAC Address
-    PORT=-1                         # Console port
-    TIMEZONE=US/Eastern             # Timezone
-    ADDITIONAL_USER=${USER}         # User
-    VERBOSE=0                       # Verbosity
+    CPUS=1                              # Number of virtual CPUs
+    FEATURE=host                        # Use host cpu features to the guest
+    MEMORY=1024                         # Amount of RAM in MB
+    DISK_SIZE=""                        # Disk Size in GB
+    DNSDOMAIN=crypticmonsters.com       # DNS domain
+    GRAPHICS=vnc                        # Graphics type
+    RESIZE_DISK=false                   # Resize disk (boolean)
+    IMAGEDIR=/var/lib/libvirt/images    # Directory to store images
+    BRIDGE=br0                          # Hypervisor bridge
+    PUBKEY=""                           # SSH public key
+    DISTRO=centos7                      # Distribution
+    MACADDRESS=""                       # MAC Address
+    PORT=-1                             # Console port
+    TIMEZONE=Europe/Dublin              # Timezone
+    ADDITIONAL_USER=${USER}             # User
+    VERBOSE=0                           # Verbosity
 
     # Reset OPTIND
     OPTIND=1

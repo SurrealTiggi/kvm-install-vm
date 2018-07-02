@@ -1,7 +1,7 @@
 ## .kivrc - Set custom defaults for kvm-install-vm
 
 # Autostart
-#AUTOSTART=false
+AUTOSTART=true
 
 # Number of virtual CPUs
 #CPUS=1
@@ -16,10 +16,10 @@
 #DISK_SIZE=10
 
 # DNS domain
-#DNSDOMAIN=example.local
+DNSDOMAIN=crypticmonsters.com
 
 # Graphics type
-#GRAPHICS=spice
+GRAPHICS=vnc
 
 # Console port
 #PORT=-1
@@ -28,10 +28,10 @@
 #RESIZE_DISK=false
 
 # Directory to store images
-#IMAGEDIR=${HOME}/virt/images
+IMAGEDIR=/var/lib/libvirt/images
 
 # Hypervisor bridge
-#BRIDGE=virbr0
+BRIDGE=br0
 
 # SSH public key
 #PUBKEY=${HOME}/.ssh/id_rsa.pub
@@ -43,7 +43,7 @@
 #MACADDRESS=
 
 # Timezone
-#TIMEZONE=US/Eastern
+#TIMEZONE=Europe/Dublin
 
 # User
 #ADDITIONAL_USER=${USER}
