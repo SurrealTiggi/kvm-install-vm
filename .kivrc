@@ -16,7 +16,7 @@ AUTOSTART=true
 #DISK_SIZE=10
 
 # DNS domain
-DNSDOMAIN=crypticmonsters.com
+#DNSDOMAIN=example.local
 
 # Graphics type
 GRAPHICS=vnc

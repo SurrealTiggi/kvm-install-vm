@@ -343,6 +343,12 @@ function create_vm ()
     touch ${VMNAME}.log
 
     # cloud-init initial config
+    if [ ! -f "${CLOUD_INIT_CFG}" ]
+    then
+        # Check for existence of a pubkey, or else exit with message
+        die "No cloud.cfg found!"
+    fi
+
     cat $CLOUD_INIT_CFG | envsubst > $USER_DATA
 
     if [ ! -z "${SCRIPTNAME+x}" ]
@@ -626,7 +632,7 @@ function create ()
     fi
 
     # Set cloud-init variables after VMNAME is assigned
-    CLOUD_INIT_CFG=cloud.cfg
+    CLOUD_INIT_CFG=${HOME}/cloud.cfg
     USER_DATA=user-data
     META_DATA=meta-data
     CI_ISO=${VMNAME}-cidata.iso
