@@ -72,7 +72,7 @@ OPTIONS
     -s          Custom shell script
     -t          Linux Distribution  (default: centos7)
     -T          Timezone            (default: Europe/Dublin)
-    -u          Custom user         (defualt: $USER)
+    -u          Custom user         (default: $USER)
     -v          Be verbose
 
 DISTRIBUTIONS

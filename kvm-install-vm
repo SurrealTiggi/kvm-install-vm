@@ -302,9 +302,6 @@ function set_sudo_group ()
 function set_cloud_init_remove ()
 {
     case "${DISTRO}" in
-        centos6 )
-            CLOUDINITDISABLE="chkconfig cloud-init off"
-            ;;
         centos7|amazon?|fedora??|ubuntu*|debian? )
             CLOUDINITDISABLE="systemctl disable cloud-init.service"
             ;;
@@ -345,50 +342,8 @@ function create_vm ()
     # Create log file
     touch ${VMNAME}.log
 
-    # cloud-init config: set hostname, remove cloud-init package,
-    # and add ssh-key
-    cat > $USER_DATA << _EOF_
-Content-Type: multipart/mixed; boundary="==BOUNDARY=="
-MIME-Version: 1.0
---==BOUNDARY==
-Content-Type: text/cloud-config; charset="us-ascii"
-
-#cloud-config
-
-# Hostname management
-preserve_hostname: False
-hostname: ${VMNAME}
-fqdn: ${VMNAME}.${DNSDOMAIN}
-
-# Users
-users:
-    - default
-    - name: ${ADDITIONAL_USER}
-      groups: ['${SUDOGROUP}']
-      shell: /bin/bash
-      sudo: ALL=(ALL) NOPASSWD:ALL
-      ssh-authorized-keys:
-        - ${KEY}
-
-# Configure where output will go
-output:
-  all: ">> /var/log/cloud-init.log"
-
-# configure interaction with ssh server
-ssh_genkeytypes: ['ed25519', 'rsa']
-
-# Install my public ssh key to the first user-defined user configured
-# in cloud.cfg in the template (which is centos for CentOS cloud images)
-ssh_authorized_keys:
-  - ${KEY}
-
-timezone: ${TIMEZONE}
-
-# Remove cloud-init when finished with it
-runcmd:
-  - ${NETRESTART}
-  - ${CLOUDINITDISABLE}
-_EOF_
+    # cloud-init initial config
+    cat $CLOUD_INIT_CFG | envsubst > $USER_DATA
 
     if [ ! -z "${SCRIPTNAME+x}" ]
     then
@@ -671,6 +626,7 @@ function create ()
     fi
 
     # Set cloud-init variables after VMNAME is assigned
+    CLOUD_INIT_CFG=cloud.cfg
     USER_DATA=user-data
     META_DATA=meta-data
     CI_ISO=${VMNAME}-cidata.iso
