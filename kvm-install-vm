@@ -266,7 +266,7 @@ function check_ssh_key ()
              specify one with the "-k" flag."
     else
         # Place contents of $PUBKEY into $KEY
-        KEY=$(<${PUBKEY})
+        export KEY=$(<${PUBKEY})
     fi
 }
 
@@ -538,7 +538,7 @@ function remove ()
         printf "Run 'kvm-install-vm help remove' for usage.\n"
         exit 1
     else
-        VMNAME=$1
+        export VMNAME=$1
     fi
 
     # Check if domain exists and set DOMAIN_EXISTS variable.
@@ -553,25 +553,26 @@ function remove ()
 function set_defaults ()
 {
     # Defaults are set here. Override using command line arguments.
-    CPUS=1                              # Number of virtual CPUs
-    FEATURE=host                        # Use host cpu features to the guest
-    MEMORY=1024                         # Amount of RAM in MB
-    DISK_SIZE=""                        # Disk Size in GB
-    DNSDOMAIN=crypticmonsters.com       # DNS domain
-    GRAPHICS=vnc                        # Graphics type
-    RESIZE_DISK=false                   # Resize disk (boolean)
-    IMAGEDIR=/var/lib/libvirt/images    # Directory to store images
-    BRIDGE=br0                          # Hypervisor bridge
-    PUBKEY=""                           # SSH public key
-    DISTRO=centos7                      # Distribution
-    MACADDRESS=""                       # MAC Address
-    PORT=-1                             # Console port
-    TIMEZONE=Europe/Dublin              # Timezone
-    ADDITIONAL_USER=${USER}             # User
-    VERBOSE=0                           # Verbosity
+    export CPUS=1                              # Number of virtual CPUs
+    export FEATURE=host                        # Use host cpu features to the guest
+    export MEMORY=1024                         # Amount of RAM in MB
+    export DISK_SIZE=""                        # Disk Size in GB
+    export DNSDOMAIN=""                        # DNS domain
+    export GRAPHICS=vnc                        # Graphics type
+    export RESIZE_DISK=false                   # Resize disk (boolean)
+    export IMAGEDIR=/var/lib/libvirt/images    # Directory to store images
+    export BRIDGE=br0                          # Hypervisor bridge
+    export PUBKEY=""                           # SSH public key
+    export DISTRO=centos7                      # Distribution
+    export MACADDRESS=""                       # MAC Address
+    export PORT=-1                             # Console port
+    export TIMEZONE=Europe/Dublin              # Timezone
+    export ADDITIONAL_USER=${USER}             # User
+    export VERBOSE=0                           # Verbosity
+
 
     # Reset OPTIND
-    OPTIND=1
+    export OPTIND=1
 }
 
 function set_custom_defaults ()
