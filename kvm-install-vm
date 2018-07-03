@@ -1,143 +1,11 @@
 #!/bin/bash
 set -e
 
+# Imports
+. ./lib/usage --source-only
+
 # Set program name variable - basename without subshell
 prog=${0##*/}
-
-function usage ()
-{
-    cat << EOF
-NAME
-    kvm-install-vm - Install virtual guests using cloud-init on a local KVM
-    hypervisor.
-
-SYNOPSIS
-    $prog COMMAND [OPTIONS]
-
-DESCRIPTION
-    A bash wrapper around virt-install to build virtual machines on a local KVM
-    hypervisor. You can run it as a normal user which will use qemu:///session
-    to connect locally to your KVM domains.
-
-COMMANDS
-    help        - show this help or help for a subcommand
-    attach-disk - create and attach a disk device to guest domain
-    create      - create a new guest domain
-    detach-disk - detach a disk device from a guest domain
-    list        - list all domains, running and stopped
-    remove      - delete a guest domain
-
-EOF
-exit 0
-}
-
-function usage_subcommand ()
-{
-    case "$1" in
-        create)
-            printf "NAME\n"
-            printf "    $prog create [COMMANDS] [OPTIONS] VMNAME\n"
-            printf "\n"
-            printf "DESCRIPTION\n"
-            printf "    Create a new guest domain.\n"
-            printf "\n"
-            printf "COMMANDS\n"
-            printf "    help - show this help\n"
-            printf "\n"
-            printf "OPTIONS\n"
-            printf "    -a          Autostart           (default: true)\n"
-            printf "    -b          Bridge              (default: br0)\n"
-            printf "    -c          Number of vCPUs     (default: 1)\n"
-            printf "    -d          Disk Size (GB)      (default: 10)\n"
-            printf "    -D          DNS Domain          (default: crypticmonsters.com)\n"
-            printf "    -f          CPU Model / Feature (default: host)\n"
-            printf "    -g          Graphics type       (default: vnc)\n"
-            printf "    -h          Display help\n"
-            printf "    -i          Custom QCOW2 Image\n"
-            printf "    -k          SSH Public Key      (default: $HOME/.ssh/id_rsa.pub)\n"
-            printf "    -l          Location of Images  (default: /var/lib/libvirt/images)\n"
-            printf "    -m          Memory Size (MB)    (default: 1024)\n"
-            printf "    -M mac      Mac address         (default: auto-assigned)\n"
-            printf "    -p          Console port        (default: auto)\n"
-            printf "    -s          Custom shell script\n"
-            printf "    -t          Linux Distribution  (default: centos7)\n"
-            printf "    -T          Timezone            (default: Europe/Dublin)\n"
-            printf "    -u          Custom user         (default: $USER)\n"
-            printf "    -v          Be verbose\n"
-            printf "\n"
-            printf "DISTRIBUTIONS\n"
-            printf "    NAME            DESCRIPTION                         LOGIN\n"
-            printf "    centos7         CentOS 7                            centos\n"
-            printf "    centos7-atomic  CentOS 7 Atomic Host                centos\n"
-            printf "    ubuntu1604      Ubuntu 16.04 LTS (Xenial Xerus)     ubuntu\n"
-            printf "\n"
-            printf "EXAMPLES\n"
-            printf "    $prog create foo\n"
-            printf "        Create VM with the default parameters: CentOS 7, 1 vCPU, 1GB RAM, 10GB\n"
-            printf "        disk capacity.\n"
-            printf "\n"
-            printf "    $prog create -c 2 -m 2048 -d 20 foo\n"
-            printf "        Create VM with custom parameters: 2 vCPUs, 2GB RAM, and 20GB disk\n"
-            printf "        capacity.\n"
-            printf "\n"
-            printf "    $prog create -t debian9 foo\n"
-            printf "        Create a Debian 9 VM with the default parameters.\n"
-            printf "\n"
-            printf "    $prog create -T UTC foo\n"
-            printf "        Create a default VM with UTC timezone.\n"
-            printf "\n"
-            ;;
-        remove)
-            printf "NAME\n"
-            printf "    $prog remove [COMMANDS] VMNAME\n"
-            printf "\n"
-            printf "DESCRIPTION\n"
-            printf "    Destroys (stops) and undefines a guest domain.  This also remove the\n"
-            printf "    associated storage pool.\n"
-            printf "\n"
-            printf "COMMANDS\n"
-            printf "    help - show this help\n"
-            printf "\n"
-            printf "EXAMPLE\n"
-            printf "    $prog remove foo\n"
-            printf "        Remove (destroy and undefine) a guest domain.  WARNING: This will\n"
-            printf "        delete the guest domain and any changes made inside it!\n"
-            ;;
-        attach-disk)
-            printf "NAME\n"
-            printf "    $prog attach-disk [OPTIONS] [COMMANDS] VMNAME\n"
-            printf "\n"
-            printf "DESCRIPTION\n"
-            printf "    Attaches a new disk to a guest domain.\n"
-            printf "\n"
-            printf "COMMANDS\n"
-            printf "    help - show this help\n"
-            printf "\n"
-            printf "OPTIONS\n"
-            printf "    -d SIZE     Disk size (GB)\n"
-            printf "    -f FORMAT   Disk image format       (default: qcow2)\n"
-            printf "    -s IMAGE    Source of disk device\n"
-            printf "    -t TARGET   Disk device target\n"
-            printf "\n"
-            printf "EXAMPLE\n"
-            printf "    $prog attach-disk -d 10 -s example-5g.qcow2 -t vdb foo\n"
-            printf "        Attach a 10GB disk device named example-5g.qcow2 to the foo guest\n"
-            printf "        domain.\n"
-            ;;
-        list)
-            printf "NAME\n"
-            printf "    $prog list\n"
-            printf "\n"
-            printf "DESCRIPTION\n"
-            printf "    Lists all running and stopped guest domains.\n"
-            ;;
-        *)
-            printf "'$subcommand' is not a valid subcommand.\n"
-            exit 1
-            ;;
-    esac
-    exit 0
-}
 
 # Console output colors
 bold() { echo -e "\e[1m$@\e[0m" ; }
@@ -145,7 +13,7 @@ red() { echo -e "\e[31m$@\e[0m" ; }
 green() { echo -e "\e[32m$@\e[0m" ; }
 yellow() { echo -e "\e[33m$@\e[0m" ; }
 
-die() { red "ERR: $@" >&2 ; exit 2 ; }
+die() { red "ERROR: $@" >&2 ; exit 2 ; }
 silent() { "$@" > /dev/null 2>&1 ; }
 output() { echo -e "- $@" ; }
 outputn() { echo -en "- $@ ... " ; }
