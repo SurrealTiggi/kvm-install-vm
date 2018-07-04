@@ -50,3 +50,6 @@ export TIMEZONE=Europe/Dublin
 
 # Verbosity
 export VERBOSE=0
+
+# Script
+#SCRIPT="~/script.sh"

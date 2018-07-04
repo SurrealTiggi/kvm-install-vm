@@ -45,7 +45,7 @@ function usage_subcommand ()
             printf "    -b          Bridge              (default: br0)\n"
             printf "    -c          Number of vCPUs     (default: 1)\n"
             printf "    -d          Disk Size (GB)      (default: 10)\n"
-            printf "    -D          DNS Domain          (default: crypticmonsters.com)\n"
+            printf "    -D          DNS Domain          (default: example.local)\n"
             printf "    -f          CPU Model / Feature (default: host)\n"
             printf "    -g          Graphics type       (default: vnc)\n"
             printf "    -h          Display help\n"
