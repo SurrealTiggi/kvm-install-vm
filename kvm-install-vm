@@ -2,11 +2,11 @@
 set -e
 
 # Imports
-. ./lib/usage --source-only
-. ./lib/colors --source-only
-. ./lib/checkers --source-only
-. ./lib/setters --source-only
-. ./lib/vm_helpers --source-only
+. /var/lib/kvm-install-vm/usage --source-only
+. /var/lib/kvm-install-vm/colors --source-only
+. /var/lib/kvm-install-vm/checkers --source-only
+. /var/lib/kvm-install-vm/setters --source-only
+. /var/lib/kvm-install-vm/vm_helpers --source-only
 
 # Set program name variable - basename without subshell
 prog=${0##*/}
