@@ -137,8 +137,7 @@ function usage_subcommand ()
 
 function main()
 {
-    usage
-    usage_subcommand
+    echo "This is a main function placeholder"
 }
 
 if [ "${1}" != "--source-only" ]; then

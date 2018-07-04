@@ -1,0 +1,95 @@
+#!/bin/sh
+
+# Defaults are set here. Override using command line arguments.
+function set_defaults ()
+{
+    export CPUS=1                              # Number of virtual CPUs
+    export FEATURE=host                        # Use host cpu features to the guest
+    export MEMORY=1024                         # Amount of RAM in MB
+    export DISK_SIZE=""                        # Disk Size in GB
+    export DNSDOMAIN=""                        # DNS domain
+    export GRAPHICS=vnc                        # Graphics type
+    export RESIZE_DISK=false                   # Resize disk (boolean)
+    export IMAGEDIR=/var/lib/libvirt/images    # Directory to store images
+    export BRIDGE=br0                          # Hypervisor bridge
+    export PUBKEY=""                           # SSH public key
+    export DISTRO=centos7                      # Distribution
+    export MACADDRESS=""                       # MAC Address
+    export PORT=-1                             # Console port
+    export TIMEZONE=Europe/Dublin              # Timezone
+    export ADDITIONAL_USER=${USER}             # User
+    export VERBOSE=0                           # Verbosity
+
+
+    # Reset OPTIND
+    export OPTIND=1
+}
+
+# Check if local default env file exists
+function set_custom_defaults ()
+{
+    # Source custom defaults, if set
+    if [ -f ~/.kivrc ];
+    then
+        source ${HOME}/.kivrc
+    fi
+}
+
+# Set wget parameters
+function set_wget ()
+{
+    if [ -f /etc/fedora-release ]
+    then
+        WGET="wget --quiet --show-progress"
+    else
+        WGET="wget"
+    fi
+}
+
+# Set default sudo group
+function set_sudo_group ()
+{
+    case "${DISTRO}" in
+        centos?|fedora??|*-atomic|amazon? )
+            export SUDOGROUP="wheel"
+            ;;
+        ubuntu*|debian? )
+            export SUDOGROUP="sudo"
+            ;;
+        *)
+            die "OS not supported."
+            ;;
+    esac
+}
+
+# Set cloud-init service
+function set_cloud_init_remove ()
+{
+    case "${DISTRO}" in
+        centos7|amazon?|fedora??|ubuntu*|debian? )
+            export CLOUDINITDISABLE="systemctl disable cloud-init.service"
+            ;;
+        *-atomic)
+            export CLOUDINITDISABLE="/usr/bin/true"
+            ;;
+    esac
+}
+
+# Set network service
+function set_network_restart_cmd ()
+{
+    case "${DISTRO}" in
+        centos6 )           export NETRESTART="service network stop && service network start" ;;
+        ubuntu*|debian?)    export NETRESTART="systemctl stop networking && systemctl start networking" ;;
+        *)                  export NETRESTART="systemctl stop network && systemctl start network" ;;
+    esac
+}
+
+function main()
+{
+    echo "This is a main function placeholder"
+}
+
+if [ "${1}" != "--source-only" ]; then
+        main "${@}"
+fi

@@ -1,0 +1,62 @@
+#!/bin/sh
+
+function check_vmname_set ()
+{
+    [ -n "${VMNAME}" ] || die "VMNAME not set."
+}
+
+function check_ssh_key ()
+{
+    local key
+    if [ -z "${PUBKEY}" ]; then
+        # Try to find a suitable key file.
+        for key in ~/.ssh/id_{rsa,dsa,ed25519}.pub; do
+            if [ -f "$key" ]; then
+                PUBKEY="$key"
+                break
+            fi
+        done
+    fi
+
+    if [ ! -f "${PUBKEY}" ]
+    then
+        # Check for existence of a pubkey, or else exit with message
+        die "Please generate an SSH keypair using 'ssh-keygen -t rsa' or \
+             specify one with the "-k" flag."
+    else
+        # Place contents of $PUBKEY into $KEY
+        export KEY=$(<${PUBKEY})
+    fi
+}
+
+function check_delete_known_host ()
+{
+    output "Checking for ${IP} in known_hosts file"
+    grep -q ${IP} ${HOME}/.ssh/known_hosts \
+        && outputn "Found entry for ${IP}. Removing" \
+        && (sed --in-place "/^${IP}/d" ~/.ssh/known_hosts && ok ) \
+        || output "No entries found for ${IP}"
+}
+
+function check_domain_exists ()
+{
+    virsh dominfo "${1}" > /dev/null 2>&1 \
+        && DOMAIN_EXISTS=1 \
+        || DOMAIN_EXISTS=0
+}
+
+function check_storpool_exists ()
+{
+    virsh pool-info "${1}" > /dev/null 2>&1 \
+        && STORPOOL_EXISTS=1 \
+        || STORPOOL_EXISTS=0
+}
+
+function main()
+{
+    echo "This is a main function placeholder"
+}
+
+if [ "${1}" != "--source-only" ]; then
+        main "${@}"
+fi
