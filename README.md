@@ -21,6 +21,8 @@ Then, add `libvirt` and `libvirt_guest` to list of **hosts** databases in
 `/etc/nsswitch.conf`.  See [here](https://libvirt.org/nss.html) for more
 information.
 
+Lastly, ensure the contents of the [lib directory](https://github.com/SurrealTiggi/kvm-install-vm/tree/master/lib) exist in `/var/lib/kvm-install-vm/`
+
 ### Usage
 
 ```
