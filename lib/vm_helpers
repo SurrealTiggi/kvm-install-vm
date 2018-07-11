@@ -99,7 +99,8 @@ function cloudinit ()
     if [ ! -f "${CLOUD_INIT_CFG}" ]
     then
         # Check for existence of a pubkey, or else exit with message
-        die "No cloud.cfg found!"
+        die "No cloud.cfg found! You may need to manually redowload from \
+        https://raw.githubusercontent.com/SurrealTiggi/kvm-install-vm/master/cloud.cfg"
     fi
 
     cat $CLOUD_INIT_CFG | envsubst > $USER_DATA

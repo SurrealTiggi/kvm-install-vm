@@ -23,11 +23,12 @@ information.
 
 ### Installation
 
-Basically, you just need to download [kvm-install-vm](https://raw.githubusercontent.com/SurrealTiggi/kvm-install-vm/master/kvm-install-vm) and `chmod +x kvm-install-vm`, wherever you decide to install it (eg. /usr/sbin/).
+Basically, you just need to download [kvm-install-vm](https://raw.githubusercontent.com/SurrealTiggi/kvm-install-vm/master/kvm-install-vm) and `chmod +x kvm-install-vm`, wherever you decide to install it (eg. `/usr/sbin/kvm-install-vm`).
 
 On every run the script checks that:
 - `/var/lib/kvm-install-vm/` exists, and has all expected sources, and fetches them if not.
 - `~/.kivrc` exists, if not, an interactive dialog kicks off to fetch the default file, and fill it out with any custom flags the user wants.
+- `~/cloud.cfg` cloud-init config exists, fetches if not (NB. Well, sort of. It'll fetch it the first time, if .kivrc doesn't exist, but subsequent changes will need to be manual. Could refine this.)
 
 ### Usage
 
