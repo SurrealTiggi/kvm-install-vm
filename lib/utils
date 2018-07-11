@@ -45,8 +45,8 @@ function custom_interaction ()
 {
     cd ~
     set_wget
-    ${WGET} https://raw.githubusercontent.com/SurrealTiggi/kvm-install-vm/master/.kivrc
-    ${WGET} https://raw.githubusercontent.com/SurrealTiggi/kvm-install-vm/master/cloud.cfg
+    ${WGET} --quiet --show-progress https://raw.githubusercontent.com/SurrealTiggi/kvm-install-vm/master/.kivrc
+    ${WGET} --quiet --show-progress https://raw.githubusercontent.com/SurrealTiggi/kvm-install-vm/master/cloud.cfg
 
     printf "Would you like to personalize .kivrc? (y/n)"
     read answer
