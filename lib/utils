@@ -6,7 +6,7 @@ function customize() {
     red "* Your input will not be validated so please use correct values."
     red "* Default value in brackets can be used as guidance."
     red "* Empty answers will be ignored."
-    red "======================================="
+    red "============================================"
 
     yellow "CPU (1)?: "
     read cpu
@@ -22,22 +22,22 @@ function customize() {
     read script
 
     # Now we just go through each one above and replace accordingly
-    if [ !-z $cpu ]; then
+    if [ ! -z $cpu ]; then
         sed -i "s/#export CPUS=1/export CPUS=${cpu}/g" ${HOME}/.kivrc
     fi
-    if [ !-z $ram ]; then
+    if [ ! -z $ram ]; then
         sed -i "s/#export MEMORY=1024/export MEMORY=${ram}/g" ${HOME}/.kivrc
     fi
-    if [ !-z $disk ]; then
+    if [ ! -z $disk ]; then
         sed -i "s/#export DISK_SIZE=10/export DISK_SIZE=${disk}/g" ${HOME}/.kivrc
     fi
-    if [ !-z $dns ]; then
+    if [ ! -z $dns ]; then
         sed -i "s/#export DNSDOMAIN=example.local/export DNSDOMAIN=${dns}/g" ${HOME}/.kivrc
     fi
-    if [ !-z $adduser ]; then
+    if [ ! -z $adduser ]; then
         sed -i "s/#export ADDITIONAL_USER=none/#export ADDITIONAL_USER=${adduser}/g" ${HOME}/.kivrc
     fi
-    if [ !-z $script ]; then
+    if [ ! -z $script ]; then
         sed  -i "s/#SCRIPT=\"~\/script.sh\"/SCRIPT=\"~\/${script}\"/g" ${HOME}/.kivrc
     fi
 }
@@ -46,8 +46,8 @@ function custom_interaction ()
 {
     cd ~
     set_wget
-    ${WGET} --quiet --show-progress https://raw.githubusercontent.com/SurrealTiggi/kvm-install-vm/master/.kivrc
-    ${WGET} --quiet --show-progress https://raw.githubusercontent.com/SurrealTiggi/kvm-install-vm/master/cloud.cfg
+    ${WGET} --quiet https://raw.githubusercontent.com/SurrealTiggi/kvm-install-vm/master/.kivrc
+    ${WGET} --quiet https://raw.githubusercontent.com/SurrealTiggi/kvm-install-vm/master/cloud.cfg
 
     green "============================================"
     green "Would you like to personalize .kivrc? (y/n): "
