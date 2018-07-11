@@ -21,7 +21,13 @@ Then, add `libvirt` and `libvirt_guest` to list of **hosts** databases in
 `/etc/nsswitch.conf`.  See [here](https://libvirt.org/nss.html) for more
 information.
 
-Lastly, ensure the contents of the [lib directory](https://github.com/SurrealTiggi/kvm-install-vm/tree/master/lib) exist in `/var/lib/kvm-install-vm/`
+### Installation
+
+Basically, you just need to download [kvm-install-vm](https://raw.githubusercontent.com/SurrealTiggi/kvm-install-vm/master/kvm-install-vm) and `chmod +x kvm-install-vm`, wherever you decide to install it (eg. /usr/sbin/).
+
+On every run the script checks that:
+- `/var/lib/kvm-install-vm/` exists, and has all expected sources, and fetches them if not.
+- `~/.kivrc` exists, if not, an interactive dialog kicks off to fetch the default file, and fill it out with any custom flags the user wants.
 
 ### Usage
 

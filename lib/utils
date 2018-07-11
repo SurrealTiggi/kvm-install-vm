@@ -1,0 +1,74 @@
+#!/bin/sh
+
+function customize() {
+    printf "======================================="
+    printf "* Please answer with your preferred default values.
+            * Your input will not be validated so please use correct values.
+            * Default value in brackets can be used as guidance.
+            * Empty answers will be ignored."
+    printf "======================================="
+    printf "CPU (1)?: "
+    read cpu
+    printf "MEMORY (1024)?: "
+    read ram
+    printf "DISK_SIZE (10GB)?: "
+    read disk
+    printf "DNSDOMAIN (example.local)?: "
+    read dns
+    printf "ADDITIONAL_USER (none)?: "
+    read adduser
+    printf "SCRIPT (script.sh)?: "
+    read script
+
+    # Now we just go through each one above and replace accordingly
+    if [ !-z $cpu]; then
+        sed -i "s/#export CPUS=1/export CPUS=${cpu}/g" ${HOME}/.kivrc
+    fi
+    if [ !-z $ram]; then
+        sed -i "s/#export MEMORY=1024/export MEMORY=${ram}/g" ${HOME}/.kivrc
+    fi
+    if [ !-z $disk]; then
+        sed -i "s/#export DISK_SIZE=10/export DISK_SIZE=${disk}/g" ${HOME}/.kivrc
+    fi
+    if [ !-z $dns]; then
+        sed -i "s/#export DNSDOMAIN=example.local/export DNSDOMAIN=${dns}/g" ${HOME}/.kivrc
+    fi
+    if [ !-z $adduser]; then
+        sed -i "s/#export ADDITIONAL_USER=none/#export ADDITIONAL_USER=${adduser}/g" ${HOME}/.kivrc
+    fi
+    if [ !-z $script]; then
+        sed  -i "s/#SCRIPT=\"~\/script.sh\"/SCRIPT=\"~\/${script}\"/g" ${HOME}/.kivrc
+    fi
+}
+
+function custom_interaction ()
+{
+    cd ~
+    set_wget
+    ${WGET} https://raw.githubusercontent.com/SurrealTiggi/kvm-install-vm/master/.kivrc
+
+    printf "Would you like to personalize .kivrc? (y/n)"
+    read answer
+
+    case "${answer}" in:
+        y)
+            customize
+            ;;
+        n)
+            printf "Keeping defaults. Bye!"
+            ;;
+        *)
+            printf "Invalid answer!!!"
+            custom_interaction
+            ;;
+    esac
+}
+
+function main()
+{
+    echo "This is a main function placeholder"
+}
+
+if [ "${1}" != "--source-only" ]; then
+        main "${@}"
+fi

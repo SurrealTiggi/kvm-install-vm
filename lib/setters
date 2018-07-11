@@ -29,8 +29,10 @@ function set_defaults ()
 function set_custom_defaults ()
 {
     # Source custom defaults, if set
-    if [ -f ~/.kivrc ];
-    then
+    if [ -f ~/.kivrc ]; then
+        source ${HOME}/.kivrc
+    else
+        custom_interaction
         source ${HOME}/.kivrc
     fi
 }

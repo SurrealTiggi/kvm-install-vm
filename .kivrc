@@ -46,7 +46,7 @@ export BRIDGE=br0
 export TIMEZONE=Europe/Dublin
 
 # User
-#export ADDITIONAL_USER=${USER}
+#export ADDITIONAL_USER=none
 
 # Verbosity
 export VERBOSE=0

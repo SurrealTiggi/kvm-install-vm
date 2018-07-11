@@ -2,110 +2,32 @@
 set -e
 
 # Imports
-. /var/lib/kvm-install-vm/usage --source-only
-. /var/lib/kvm-install-vm/colors --source-only
-. /var/lib/kvm-install-vm/checkers --source-only
-. /var/lib/kvm-install-vm/setters --source-only
-. /var/lib/kvm-install-vm/vm_helpers --source-only
+# Fetch if they don't exist
+LIB_DIR=/var/lib/kvm-install-vm
+NUM_CONFIGS=$(ls -1 $LIB_DIR | wc -l)
+
+if [ !-d $LIB_DIR ] || [ $NUM_CONFIGS < 6 ]; then
+    mkdir -p $LIB_DIR
+    rm -f $LIB_DIR/*
+    git clone https://github.com/SurrealTiggi/kvm-install-vm.git /tmp/kvm
+    mv /tmp/kvm/lib/* $LIB_DIR/
+    rm -rf /tmp/kvm
+else
+    echo "Libraries found so continuing..."
+fi
+
+. $LIB_DIR/usage --source-only
+. $LIB_DIR/colors --source-only
+. $LIB_DIR/checkers --source-only
+. $LIB_DIR/setters --source-only
+. $LIB_DIR/utils --source-only
+. $LIB_DIR/vm_helpers --source-only
 
 # Set program name variable - basename without subshell
 prog=${0##*/}
 
 pushd() { command pushd "$@" >/dev/null ; }
 popd() { command popd "$@" >/dev/null ; }
-
-function create ()
-{
-    # Parse command line arguments
-    while getopts ":a:b:c:d:D:f:g:i:k:l:m:M:p:s:t:T:u:hv" opt
-    do
-        case "$opt" in
-            a ) AUTOSTART=true ;;
-            b ) BRIDGE="${OPTARG}" ;;
-            c ) CPUS="${OPTARG}" ;;
-            d ) DISK_SIZE="${OPTARG}" ;;
-            D ) DNSDOMAIN="${OPTARG}" ;;
-            f ) FEATURE="${OPTARG}" ;;
-            g ) GRAPHICS="${OPTARG}" ;;
-            i ) IMAGE="${OPTARG}" ;;
-            k ) PUBKEY="${OPTARG}" ;;
-            l ) IMAGEDIR="${OPTARG}" ;;
-            m ) MEMORY="${OPTARG}" ;;
-            M ) MACADDRESS="${OPTARG}" ;;
-            p ) PORT="${OPTARG}" ;;
-            s ) SCRIPTNAME="${OPTARG}" ;;
-            t ) DISTRO="${OPTARG}" ;;
-            T ) TIMEZONE="${OPTARG}" ;;
-            u ) ADDITIONAL_USER="${OPTARG}" ;;
-            v ) VERBOSE=1 ;;
-            h ) usage ;;
-            * ) die "Unsupported option. Run 'kvm-install-vm help create'." ;;
-        esac
-    done
-
-    shift $((OPTIND - 1))
-
-    # Resize disk if you specify a disk size either via cmdline option or .kivrc
-    if [ -n "${DISK_SIZE}" ]
-    then
-        RESIZE_DISK=true
-        DISK_SIZE="${DISK_SIZE}G"   # Append 'G' for Gigabyte
-    fi
-
-    # After all options are processed, make sure only one variable is left (vmname)
-    if [ "$#" != 1 ]
-    then
-        printf "Please specify a single host to create.\n"
-        printf "Run 'kvm-install-vm help create' for usage.\n"
-        exit 1
-    else
-        export VMNAME=$1
-    fi
-
-    # Set cloud-init variables after VMNAME is assigned
-    CLOUD_INIT_CFG=${HOME}/cloud.cfg
-    USER_DATA=user-data
-    META_DATA=meta-data
-    CI_ISO=${VMNAME}-cidata.iso
-
-    # Check for ssh key
-    check_ssh_key
-
-    if [ ! -z "${IMAGE+x}" ]
-    then
-        output "Using custom QCOW2 image: ${IMAGE}."
-        OS_VARIANT="auto"
-        LOGIN_USER="<use the default account in your custom image>"
-    else
-        fetch_images
-    fi
-
-    # Check if domain already exists
-    check_domain_exists "${VMNAME}"
-
-    if [ "${DOMAIN_EXISTS}" -eq 1 ]; then
-        echo -n "[WARNING] ${VMNAME} already exists.  "
-        read -p "Do you want to overwrite ${VMNAME} [y/N]? " -r
-        if [[ $REPLY =~ ^[Yy]$ ]]; then
-            remove ${VMNAME}
-        else
-            echo -e "\nNot overwriting ${VMNAME}. Exiting..."
-            exit 1
-        fi
-    fi
-
-    # Set network restart command
-    set_network_restart_cmd
-
-    # Set cloud init remove command
-    set_cloud_init_remove
-
-    # Set package manager
-    set_sudo_group
-
-    # Finally, create requested VM
-    create_vm
-}
 
 #--------------------------------------------------
 # Main
