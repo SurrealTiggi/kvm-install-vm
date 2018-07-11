@@ -6,7 +6,7 @@ set -e
 LIB_DIR=/var/lib/kvm-install-vm
 NUM_CONFIGS=$(ls -1 $LIB_DIR | wc -l)
 
-if [ !-d $LIB_DIR ] || [ $NUM_CONFIGS < 6 ]; then
+if [ ! -d "$LIB_DIR" ] || [ $NUM_CONFIGS -lt 6 ]; then
     mkdir -p $LIB_DIR
     rm -f $LIB_DIR/*
     git clone https://github.com/SurrealTiggi/kvm-install-vm.git /tmp/kvm

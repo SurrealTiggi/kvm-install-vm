@@ -51,7 +51,7 @@ function custom_interaction ()
     printf "Would you like to personalize .kivrc? (y/n)"
     read answer
 
-    case "${answer}" in:
+    case "${answer}" in
         y)
             customize
             ;;
