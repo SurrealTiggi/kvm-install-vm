@@ -35,7 +35,7 @@ function customize() {
         sed -i "s/#export DNSDOMAIN=example.local/export DNSDOMAIN=${dns}/g" ${HOME}/.kivrc
     fi
     if [ ! -z $adduser ]; then
-        sed -i "s/#export ADDITIONAL_USER=none/#export ADDITIONAL_USER=${adduser}/g" ${HOME}/.kivrc
+        sed -i "s/#export ADDITIONAL_USER=none/export ADDITIONAL_USER=${adduser}/g" ${HOME}/.kivrc
     fi
     if [ ! -z $script ]; then
         sed  -i "s/#SCRIPT=\"~\/script.sh\"/SCRIPT=\"~\/${script}\"/g" ${HOME}/.kivrc
