@@ -1,4 +1,5 @@
-## kvm-install-vm
+# kvm-install-vm
+[![N|Solid](https://i.imgur.com/f6CyxB4.png)](https://libvirt.org/)
 
 A bash wrapper around virt-install to build virtual machines on a local KVM
 hypervisor.  You can run it as a normal user which will use `qemu:///session` to
@@ -28,14 +29,17 @@ Basically, you just need to download [kvm-install-vm](https://raw.githubusercont
 On every run the script checks that:
 - `/var/lib/kvm-install-vm/` exists, and has all expected sources, and fetches them if not.
 - `~/.kivrc` and `~/bootstrap.sh` exist, if not, an interactive dialog kicks off to fetch the default file, and fill it out with any custom flags the user wants.
-```
-NB: bootstrap.sh asks for the location of `inventory.cfg`. This file contains <hostname>: <gist file location>, in case there are customizations in the ansible file that need to be kept private.
-```
+
+> **NOTE!**
+> bootstrap.sh asks for the location of `inventory.cfg`.
+> This file contains `<hostname>: <gist file location>`, 
+> in case there are customizations in the ansible playbook that need to be kept private.
+
 - `~/cloud.cfg` cloud-init config exists, fetches if not (NB. Well, sort of. It'll fetch it the first time, if .kivrc doesn't exist, but subsequent changes will need to be manual. Could refine this.)
 
 ### Usage
 
-```
+```sh
 $ kvm-install-vm help
 NAME
     kvm-install-vm - Install virtual guests using cloud-init on a local KVM
@@ -58,7 +62,7 @@ COMMANDS
 
 #### Creating Guest VMs
 
-```
+```sh
 $ kvm-install-vm help create
 NAME
     kvm-install-vm create [OPTIONS] VMNAME
@@ -113,29 +117,9 @@ EXAMPLES
         console accessible over VNC, and a user named 'bar'.
 ```
 
-#### Deleting a Guest Domain
-
-```
-$ kvm-install-vm help remove
-NAME
-    kvm-install-vm remove [COMMANDS] VMNAME
-
-DESCRIPTION
-    Destroys (stops) and undefines a guest domain.  This also remove the
-    associated storage pool.
-
-COMMANDS
-    help - show this help
-
-EXAMPLE
-    kvm-install-vm remove foo
-        Remove (destroy and undefine) a guest domain.  WARNING: This will
-        delete the guest domain and any changes made inside it!
-```
-
 #### Attaching a new disk
 
-```
+```sh
 $ kvm-install-vm help attach-disk
 NAME
     kvm-install-vm attach-disk [OPTIONS] [COMMANDS] VMNAME
@@ -158,19 +142,8 @@ EXAMPLE
         domain.
 ```
 
-### Setting Custom Defaults
+#### TODO (maybe?):
+- [ ] md5sum on github project to update if need be
+- [ ] Packaging (.rpm, .deb) and build status via Jenkins
+- [ ] Fix cloud.cfg nonsense.
 
-Copy the `.kivrc` file to your $HOME directory to set custom defaults.  This is
-convenient if you find yourself repeatedly setting the same options on the
-command line, like the distribution or the number of vCPUs.
-
-Options are evaluated in the following order:
-
-- Default options set in the script
-- Custom options set in `.kivrc`
-- Option flags set on the command line
-
-### Testing
-
-Tests are written using [Bats](https://github.com/sstephenson/bats).  To
-execute the tests, run `./test.sh` in the root directory of the project.
