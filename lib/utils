@@ -20,6 +20,8 @@ function customize() {
     read adduser
     yellow "SCRIPT (script.sh)?: "
     read script
+    yellow "BOOTSTRAP SCRIPT (bootstrap.py)?: "
+    read boot_script
 
     # Now we just go through each one above and replace accordingly
     if [ ! -z $cpu ]; then
@@ -38,7 +40,10 @@ function customize() {
         sed -i "s/#export ADDITIONAL_USER=none/export ADDITIONAL_USER=${adduser}/g" ${HOME}/.kivrc
     fi
     if [ ! -z $script ]; then
-        sed  -i "s/#SCRIPT=\"~\/script.sh\"/SCRIPT=\"~\/${script}\"/g" ${HOME}/.kivrc
+        sed  -i "s/#export SCRIPT=\"~\/script.sh\"/export SCRIPT=\"~\/${script}\"/g" ${HOME}/.kivrc
+    fi
+    if [ ! -z $boot_script ]; then
+        sed  -i "s/#export ORC_SCRIPT=\"~\/bootstrap.py\"/export ORC_SCRIPT=\"~\/${boot_script}\"/g" ${HOME}/.kivrc
     fi
 }
 
