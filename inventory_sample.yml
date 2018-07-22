@@ -1,14 +1,12 @@
-# Inventory mapping names to gist links for ansible files
+--- # Inventory mapping names to gist links for ansible files
 git:
   description: "Location of ansible repo if all playbooks are located in one place, skips [hosts] tree if set to true"
   enabled: false
   location: "https://gist.githubusercontent.com/githash/ansible_scripts.git"
-  
 config:
   defaults:
     description: "Global variables"
     location: "https://gist.githubusercontent.com/someuser/hash/raw/anotherhash/defaults.yml"
-
 hosts:
   vm_host1:
     description: "A virtual machine to do stuff with"

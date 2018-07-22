@@ -15,6 +15,7 @@ import os
 from os.path import expanduser
 import requests
 import re
+from yaml import load, dump
 
 # Static variables
 FORMAT = '%(asctime)s || %(levelname) || [%(filename)s:%(lineno)s - %(funcName)20s() ] : %(message)s'
@@ -47,6 +48,35 @@ def fetchInventory(url):
 
 def validateInventory():
     log.debug("Validating inventory...")
+
+    try:
+        # This will load the inventory file into an easily queryable object that we can loop through
+        with open(HOME + 'inventory.yml', 'r') as myfile:
+            myinventory = myfile.read()
+        inv = yaml.load(myinventory)
+
+        '''
+        Cases as follows:
+        1) If git[enabled] = true -> Book out the entire project and ansible-playbook ansible_scripts/<host>
+        2) If git[enabled] = false -> Grab defaults.yml
+        3) Get singular playbook -> Download the relevant playbook and ansible-playbook ansible_scripts/<host>
+        TODO: switch case tutorial
+        https://jaxenter.com/implement-switch-case-statement-python-138315.html
+        '''
+
+        for key in inv.keys():
+            if key == 'git':
+                # Check
+                pass
+            elif key == 'config':
+                pass
+
+
+    except Exception as e:
+        log.error('Failed to process inventory.yml file: ' + str(e))
+        print(Colors.FAIL + 'Unable to continue as your inventory file is un-readable. Please check it and re-run this script.')
+        sys.exit()
+
 
 def runAnsible():
     log.debug('Running ')
