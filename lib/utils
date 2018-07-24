@@ -1,6 +1,7 @@
 #!/bin/sh
 
-function customize() {
+function customize ()
+{
 
     red "* Please answer with your preferred default values."
     red "* Your input will not be validated so please use correct values."
@@ -53,6 +54,8 @@ function custom_interaction ()
     set_wget
     ${WGET} --quiet https://raw.githubusercontent.com/SurrealTiggi/kvm-install-vm/master/.kivrc
     ${WGET} --quiet https://raw.githubusercontent.com/SurrealTiggi/kvm-install-vm/master/cloud.cfg
+    ${WGET} --quiet https://raw.githubusercontent.com/SurrealTiggi/kvm-install-vm/master/bootstrap.py
+    chmod +x ./bootstrap.py
 
     green "============================================"
     green "Would you like to personalize .kivrc? (y/n): "
@@ -73,7 +76,7 @@ function custom_interaction ()
     esac
 }
 
-function main()
+function main ()
 {
     echo "This is a main function placeholder"
 }

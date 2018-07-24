@@ -157,6 +157,8 @@ EXAMPLE
 
 ## TODO
 
-- [ ] md5sum on github project to update if need be
-- [ ] Packaging (.rpm, .deb) and build status via Jenkins
-- [ ] Fix cloud.cfg nonsense.
+- [x] Implement inventory -> ansible
+- [ ] Finalize bootstrap.py
+- [ ] Check if there's a version change and update if different (use releases?)
+- [ ] Fix cloud.cfg nonsense
+- [ ] Packaging (.rpm, .deb) and build status via Jenkins ???

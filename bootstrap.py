@@ -15,6 +15,8 @@ import os
 from os.path import expanduser
 import requests
 import re
+import yaml
+import argparse
 from yaml import load, dump
 
 # Static variables
@@ -57,9 +59,10 @@ def validateInventory():
 
         '''
         Cases as follows:
-        1) If git[enabled] = true -> Book out the entire project and ansible-playbook ansible_scripts/<host>
-        2) If git[enabled] = false -> Grab defaults.yml
-        3) Get singular playbook -> Download the relevant playbook and ansible-playbook ansible_scripts/<host>
+        1) Ensure /etc/ansible/hosts is complete (INVENTORY.YML IS GOSPEL)
+        2) If git[enabled] = true -> Book out the entire project and ansible-playbook ansible_scripts/<host>
+        3) If git[enabled] = false -> Grab defaults.yml
+        4) Get singular playbook -> Download the relevant playbook and ansible-playbook ansible_scripts/<host>
         TODO: switch case tutorial
         https://jaxenter.com/implement-switch-case-statement-python-138315.html
         '''
@@ -78,8 +81,8 @@ def validateInventory():
         sys.exit()
 
 
-def runAnsible():
-    log.debug('Running ')
+def runAnsible(instance):
+    log.debug('Running with ' + instance)
 
 def promptUser():
 
@@ -95,24 +98,23 @@ def promptUser():
     else:
         print(Colors.OKGREEN + "Valid URL given, saving inventory")
         open(HOME + 'inventory.yml', 'wb').write(inventory.content)
-
-def bootstrap():
-    validateInventory()
-    runAnsible()
     
-def main(argv=None):
+def main(instance):
     '''
     Bootstrapping utility for cloud-init VMs, works as follows:
     * Checks if inventory.yml exists in current user's $HOME
     * If not, requests location to fetch it (a URL by default)
-    * Once the file is present, parse it and run ansible against the provisioned VM
+    * Once the file is present, parse it, validate local inventory, then run ansible-playbooks
+    * When finished, delete inventory.yml. That way, the external source remains gospel.
     '''
     log.debug("Starting bootstrap...")
     if not os.path.isfile(HOME + 'inventory.yml'):
         promptUser()
-        bootstrap()
+        validateInventory()
+        runAnsible(instance)
     else:
-        bootstrap()
+        validateInventory()
+        runAnsible(instance)
 
 if __name__ == '__main__':
     logging.basicConfig(format=FORMAT, filename=LOGFILE, level=os.environ.get("LOGLEVEL", "DEBUG"))
