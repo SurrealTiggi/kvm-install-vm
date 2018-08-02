@@ -4,8 +4,8 @@
 This is a basic script to do base setups on cloud instances, runs alongside cloud-init after an instance is provisioned
 TODO:
 1) Fetch your personal inventory.yml file DONE
-2) Set up local inventory for ansible
-3) Run ansible playbook against vm
+2) Set up local inventory for ansible including ~/.ansible.cfg
+3) Run ansible playbook against single vm if being called from kvm-install-vm create
 '''
 
 # Imports
@@ -119,4 +119,6 @@ def main(instance):
 if __name__ == '__main__':
     logging.basicConfig(format=FORMAT, filename=LOGFILE, level=os.environ.get("LOGLEVEL", "DEBUG"))
     log = logging.getLogger(__name__)
-    sys.exit(main())
+    sys.exit(main(None))
+
+
