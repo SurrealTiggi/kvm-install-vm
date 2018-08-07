@@ -56,3 +56,6 @@ export VERBOSE=0
 
 # Orchestrator script
 #export ORC_SCRIPT="~/bootstrap.py"
+
+# Inventory URL
+#export INV_URL="https://gist.githubusercontent.com/someuser/hash/raw/anotherhash/defaults.yml"

@@ -155,10 +155,10 @@ EXAMPLE
         domain.
 ```
 
-## TODO
+## TODO:
 
 - [x] Implement inventory -> ansible
 - [ ] Finalize bootstrap.py
-- [ ] Check if there's a version change and update if different (use releases?)
-- [ ] Fix cloud.cfg nonsense
+- [ ] Implement --install|--update|--uninstall options for easy management of new features/any updates
 - [ ] Packaging (.rpm, .deb) and build status via Jenkins ???
+- [ ] Update README.md when all the above is done

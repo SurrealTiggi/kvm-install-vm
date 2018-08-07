@@ -3,7 +3,6 @@
 '''
 This is a basic script to do base setups on cloud instances, runs alongside cloud-init after an instance is provisioned
 TODO:
-1) Fetch your personal inventory.yml file DONE
 2) Set up local inventory for ansible including ~/.ansible.cfg
 3) Run ansible playbook against single vm if being called from kvm-install-vm create
 '''
@@ -41,6 +40,7 @@ class Colors:
 
 
 def fetchInventory(url):
+    # TODO: If gist.github.com, convert to correct raw location
     try:
         r = requests.get(str(url))
         return r
@@ -67,9 +67,11 @@ def validateInventory():
         https://jaxenter.com/implement-switch-case-statement-python-138315.html
         '''
 
-        for key in inv.keys():
+        for key, value in inv.items():
             if key == 'git':
-                # Check
+                # TODO: Book out git repo into ansible_scripts folder
+                # TODO: If it exists already, then just run an update
+                # TODO: Setup ~/.ansible.cfg using variables from .kivrc
                 pass
             elif key == 'config':
                 pass
@@ -80,13 +82,16 @@ def validateInventory():
         print(Colors.FAIL + 'Unable to continue as your inventory file is un-readable. Please check it and re-run this script.')
         sys.exit()
 
-
 def runAnsible(instance):
+    # TODO: If inv.repo = True then run from inside ansible_scripts directory
     log.debug('Running with ' + instance)
+
+def cleanup():
+    log.debug('Cleaning up...')
 
 def promptUser():
 
-    answer = input(Colors.OKBLUE + 'Please specify the full URL location of your personal inventory.yml (eg. https://gist.githubusercontent.com/someuser/hash/raw/anotherhash/defaults.yml):\n\t')
+    answer = input(Colors.OKBLUE + 'Please specify the URL location of inventory.yml: \n\t')
     inventory = fetchInventory(answer)
 
     if not inventory:
@@ -98,23 +103,29 @@ def promptUser():
     else:
         print(Colors.OKGREEN + "Valid URL given, saving inventory")
         open(HOME + 'inventory.yml', 'wb').write(inventory.content)
+        # TODO: Write into .kivrc
     
 def main(instance):
     '''
     Bootstrapping utility for cloud-init VMs, works as follows:
-    * Checks if inventory.yml exists in current user's $HOME
+    * Checks if inventory.yml is defined in local .kivrc
     * If not, requests location to fetch it (a URL by default)
     * Once the file is present, parse it, validate local inventory, then run ansible-playbooks
     * When finished, delete inventory.yml. That way, the external source remains gospel.
     '''
     log.debug("Starting bootstrap...")
+    
+    # TODO: Change this to check inside .kivrc instead
+
     if not os.path.isfile(HOME + 'inventory.yml'):
         promptUser()
         validateInventory()
         runAnsible(instance)
+        cleanup() # TODO: Remove inventory.yml to force fetching a new version each time
     else:
         validateInventory()
         runAnsible(instance)
+        cleanup()
 
 if __name__ == '__main__':
     logging.basicConfig(format=FORMAT, filename=LOGFILE, level=os.environ.get("LOGLEVEL", "DEBUG"))
