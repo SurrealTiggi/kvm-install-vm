@@ -18,7 +18,7 @@ outputn() { echo -en "- $@ ... " ; }
 ok() { green "${@:-OK}" ; }
 
 # Version used for update checks, updated on each commit
-VERSION='0.0.11'
+VERSION='0.0.12'
 
 LIB_DIR=/var/lib/kvm-install-vm
 NUM_CONFIGS=$(ls -1 $LIB_DIR | grep -v cloud.cfg | wc -l)
@@ -103,6 +103,6 @@ case "${subcommand}" in
         cleanup
         ;;
     *)
-        die "'${subcommand}' is not a valid subcommand.  See 'kvm-install-vm help' for a list of subcommands."
+        die "'${subcommand}' is not a valid subcommand.  Usage: ./setup.sh --install|--update|--remove."
         ;;
 esac
