@@ -29,7 +29,7 @@ subcommand="${1:-none}"
 function check_pip ()
 {
     OS_VERSION=`awk -F= '/^NAME/{print $2}' /etc/os-release`
-    isPip = `which pip | grep -cv no`
+    isPip=`which pip | grep -cv no`
     if [ $isPip -lt 1 ]; then
         if [[ "${varFromIF=$(echo $OS_VERSION | grep -ic 'centos')}" -eq 1 ]]; then
             yum install -y python-pip
@@ -40,7 +40,7 @@ function check_pip ()
     fi
 
     # Do one last check before continuing
-    isPip = `which pip | grep -cv no`
+    isPip=`which pip | grep -cv no`
     if [ $isPip -lt 1 ]; then
         die "Was unable to install pip, please install manually then run this again."
     fi
