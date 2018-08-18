@@ -28,6 +28,7 @@ subcommand="${1:-none}"
 
 function check_pip ()
 {
+    ok "Checking pip installation"
     OS_VERSION=`awk -F= '/^NAME/{print $2}' /etc/os-release`
     isPip=`which pip | grep -cv no`
     if [ $isPip -lt 1 ]; then
@@ -48,6 +49,7 @@ function check_pip ()
 
 function install_deps ()
 {
+    ok "Installing pip dependencies"
     pip install pyyaml
     pip install python-dotenv
     pip install ansible
@@ -55,6 +57,7 @@ function install_deps ()
 
 function cleanup ()
 {
+    ok "Cleaning up"
     rm -rf $LIB_DIR/*
     rm -f /usr/sbin/kvm-install-vm
     rm -f /usr/local/bin/bootstrap.py
@@ -89,14 +92,19 @@ case "${subcommand}" in
 
         check_pip
         install_deps
+        ok "DONE!"
         # TODO: 
         # 1) Move .kivrc check from utils lib to here???
         ;;
     --update)
         NEW_VERSION=$(curl  https://raw.githubusercontent.com/SurrealTiggi/kvm-install-vm/master/setup.sh | grep 'VERSION' | cut -f2 -d'=')
+        ok "Checking for updates..."
         if [[ $VERSION != $NEW_VERSION ]]; then
+            yellow "Update found!"
             cleanup
             setup
+        else
+            ok "No updates found"
         fi
         ;;
     --remove)
