@@ -53,9 +53,6 @@ function custom_interaction ()
     cd ~
     set_wget
     ${WGET} --quiet https://raw.githubusercontent.com/SurrealTiggi/kvm-install-vm/master/.kivrc
-    ${WGET} --quiet https://raw.githubusercontent.com/SurrealTiggi/kvm-install-vm/master/cloud.cfg
-    ${WGET} --quiet https://raw.githubusercontent.com/SurrealTiggi/kvm-install-vm/master/bootstrap.py
-    chmod +x ./bootstrap.py
 
     green "============================================"
     green "Would you like to personalize .kivrc? (y/n): "

@@ -1,4 +1,4 @@
-#!/usr/env/python2
+#!/usr/bin/env python2
 
 '''
 This is a basic script to do base setups on cloud instances, runs alongside cloud-init after an instance is provisioned
@@ -14,18 +14,28 @@ import os
 from os.path import expanduser
 import requests
 import re
-import yaml
 import argparse
+from collections import OrderedDict
+
+import yaml
 from yaml import load, dump
+from dotenv import load_dotenv
+from ansible.parsing.dataloader import DataLoader
+from ansible.inventory.manager import InventoryManager
 
 # Static variables
 FORMAT = '%(asctime)s || %(levelname) || [%(filename)s:%(lineno)s - %(funcName)20s() ] : %(message)s'
 if os.name == 'nt':
     LOGFILE = str(os.getcwd() + '\\bootstrap.log')
     HOME = str(expanduser("~") + '\\')
+    ENV_FILE = str(HOME + '.kivrc')
+    ANSIBLE_INV = None
+
 else:
     LOGFILE = str(os.getcwd() + '/bootstrap.log')
     HOME = str(expanduser("~") + '/')
+    ENV_FILE = str(HOME + '.kivrc')
+    ANSIBLE_INV = '/etc/ansible/hosts'
 
 # Colors for readability
 class Colors:
@@ -38,12 +48,26 @@ class Colors:
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
 
+def ansibleHelper():
+    # TODO: Split out into its own class???
+    data_loader = DataLoader()
+    ansible_inv = InventoryManager(loader = data_loader,
+                                    sources=[ANSIBLE_INV])
+    return ansible_inv
+
 
 def fetchInventory(url):
     # TODO: If gist.github.com, convert to correct raw location
     try:
         r = requests.get(str(url))
-        return r
+
+        if r.status_code != 200:
+            print(Colors.WARNING + 'Non-existant URL given. Please retry...')
+            return False
+        else:
+            print(Colors.OKGREEN + "Valid URL given, saving inventory")
+            open(HOME + 'inventory.yml', 'wb').write(r.content)
+            return True
     except Exception as e:
         log.error('Failed to fetch given url << ' + str(url) + ' >>: ' + str(e))
         return False
@@ -56,15 +80,34 @@ def validateInventory():
         with open(HOME + 'inventory.yml', 'r') as myfile:
             myinventory = myfile.read()
         inv = yaml.load(myinventory)
+        ansible_inv = ansibleHelper()
+
+        # Create a simple string list of all ansible hostnames
+        gospel_inv = [str(i.name) for i in ansible_inv.groups.values()]
+
+        missing = set(inv['hosts'].keys()) - set(gospel_inv)
+
+
 
         '''
-        Cases as follows:
-        1) Ensure /etc/ansible/hosts is complete (INVENTORY.YML IS GOSPEL)
+        TODO:
+        1) Wipe /etc/ansible/hosts and rebuild each time from inventory.yml
         2) If git[enabled] = true -> Book out the entire project and ansible-playbook ansible_scripts/<host>
         3) If git[enabled] = false -> Grab defaults.yml
         4) Get singular playbook -> Download the relevant playbook and ansible-playbook ansible_scripts/<host>
-        TODO: switch case tutorial
-        https://jaxenter.com/implement-switch-case-statement-python-138315.html
+
+        case = OrderedDict([
+            ('1', function1),
+            ('2', function2),
+        ])
+
+        case[1]() or case[2]()
+
+        if choice in case:
+            case[choice]()
+            
+        for key, value in case.items():
+            print('%s) %s') % (key, value.__doc__)
         '''
 
         for key, value in inv.items():
@@ -92,18 +135,11 @@ def cleanup():
 def promptUser():
 
     answer = input(Colors.OKBLUE + 'Please specify the URL location of inventory.yml: \n\t')
-    inventory = fetchInventory(answer)
 
-    if not inventory:
+    while not fetchInventory(answer):
         print(Colors.WARNING + 'Invalid URL given. Please retry...')
         promptUser()
-    elif inventory.status_code != 200:
-        print(Colors.WARNING + 'Non-existant URL given. Please retry...')
-        promptUser()
-    else:
-        print(Colors.OKGREEN + "Valid URL given, saving inventory")
-        open(HOME + 'inventory.yml', 'wb').write(inventory.content)
-        # TODO: Write into .kivrc
+    # TODO: Write into .kivrc
     
 def main(instance):
     '''
@@ -111,18 +147,22 @@ def main(instance):
     * Checks if inventory.yml is defined in local .kivrc
     * If not, requests location to fetch it (a URL by default)
     * Once the file is present, parse it, validate local inventory, then run ansible-playbooks
-    * When finished, delete inventory.yml. That way, the external source remains gospel.
+    * When finished, delete inventory.yml. That way, the external source remains canonical.
     '''
     log.debug("Starting bootstrap...")
-    
-    # TODO: Change this to check inside .kivrc instead
+    load_dotenv(dotenv_path=ENV_FILE)
+    INV_URL = os.getenv("INV_URL")
 
-    if not os.path.isfile(HOME + 'inventory.yml'):
-        promptUser()
+    if INV_URL:
+        if not fetchInventory(INV_URL):
+            log.error("Invalid URL found in .kivrc, switching to prompt...")
+            promptUser()
         validateInventory()
         runAnsible(instance)
-        cleanup() # TODO: Remove inventory.yml to force fetching a new version each time
+        cleanup()
     else:
+        log.debug("No $INV_URL defined, prompting user for web location")
+        promptUser()
         validateInventory()
         runAnsible(instance)
         cleanup()

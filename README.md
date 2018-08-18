@@ -1,5 +1,7 @@
 # kvm-install-vm
 
+[![Generic badge](https://img.shields.io/badge/Version-0.0.11-GREEN.svg)](https://shields.io/)
+
 [![N|Solid](https://i.imgur.com/f6CyxB4.png)](https://libvirt.org/)
 
 A bash wrapper around virt-install to build virtual machines on a local KVM
@@ -28,6 +30,10 @@ You need to have the KVM hypervisor installed, along with a few other packages:
 - qemu-img
 - libvirt-client
 - libnss-libvirt
+- pip (NB. --install will sort these dependencies out...hopefully)
+  - pyyaml
+  - python-dotenv
+  - ansible
 
 Then, add `libvirt` and `libvirt_guest` to list of **hosts** databases in
 `/etc/nsswitch.conf`.  See [here](https://libvirt.org/nss.html) for more
@@ -35,20 +41,20 @@ information.
 
 ## Installation
 
-Basically, you just need to download [kvm-install-vm](https://raw.githubusercontent.com/SurrealTiggi/kvm-install-vm/master/kvm-install-vm) and `chmod +x kvm-install-vm`, wherever you decide to install it (eg. `/usr/sbin/kvm-install-vm`).
+Trying to go for a simpler approach, basically you should just need to download [setup.sh](https://raw.githubusercontent.com/SurrealTiggi/kvm-install-vm/master/setup.sh), `chmod +x install.sh`, and then `./setup.sh --install`.
 
 On every run the script checks that:
 
-- `/var/lib/kvm-install-vm/` exists, and has all expected sources. Fetches them if not.
-- `~/.kivrc` and `~/bootstrap.py` exist, if not, an interactive dialog kicks off to fetch both files, and fill out `~/.kivrc` with any custom flags the user wants.
+- `~/.kivrc` exists, if not, an interactive dialog kicks off to fetch it and fill it out with any custom flags the user wants.
 
 > **NOTE!**
-> When a VM is provisioned, and if you're making use of it, bootstrap.py will ask for the location of `inventory.yml`.
+> When a VM is provisioned, and if you're making use of it, you may be asked for the location of `inventory.yml`.
 > An example of this file is provided [inventory_sample.yml](https://raw.githubusercontent.com/SurrealTiggi/kvm-install-vm/master/inventory_sample.yml).
+> This file is based on using ansible to manage a small number of VMs, so skip it if you're not using it.
 > The point of this file is in case there are customizations in the ansible playbook that need to be kept private, as well as providing a single file to keep track of all VM's.
-> If you don't want to use it, just keep the 2 SCRIPT settings blank in your `.kivrc` file.
+> If you don't want to use it, just keep SCRIPT and ORC_SCRIPT flags blank in your `.kivrc` file.
 
-- `~/cloud.cfg` cloud-init config exists, fetches if not (NB. Well, sort of. It'll fetch it the first time, if .kivrc doesn't exist, but subsequent changes will need to be manual. Could refine this.)
+- `~/cloud.cfg` cloud-init config exists, else it prompts to reinstall.
 
 ### Usage
 
@@ -159,6 +165,6 @@ EXAMPLE
 
 - [x] Implement inventory -> ansible
 - [ ] Finalize bootstrap.py
-- [ ] Implement --install|--update|--uninstall options for easy management of new features/any updates
+- [x] Implement --install|--update|--remove options for easy management of new features/any updates
 - [ ] Packaging (.rpm, .deb) and build status via Jenkins ???
 - [ ] Update README.md when all the above is done
