@@ -49,7 +49,7 @@ function create ()
     fi
 
     # Set cloud-init variables after VMNAME is assigned
-    CLOUD_INIT_CFG=${HOME}/cloud.cfg
+    CLOUD_INIT_CFG=${LIB_DIR}/cloud.cfg
     USER_DATA=user-data
     META_DATA=meta-data
     CI_ISO=${VMNAME}-cidata.iso
