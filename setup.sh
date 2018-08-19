@@ -69,6 +69,7 @@ function install_deps ()
         else
             yellow "Skipping $pkg as it's already installed..."
         fi
+    done
 }
 
 function cleanup ()
