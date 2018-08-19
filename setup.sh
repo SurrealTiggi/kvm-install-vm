@@ -97,7 +97,7 @@ case "${subcommand}" in
         # 1) Move .kivrc check from utils lib to here???
         ;;
     --update)
-        NEW_VERSION=$(curl https://raw.githubusercontent.com/SurrealTiggi/kvm-install-vm/master/setup.sh | grep 'VERSION' | head -1 | cut -f2 -d'=')
+        NEW_VERSION=$(curl https://raw.githubusercontent.com/SurrealTiggi/kvm-install-vm/master/setup.sh | grep 'VERSION' | head -1 | cut -f2 -d'=' | sed -e 's/\"//g')
         ok "Checking for updates..."
         if [[ $VERSION != $NEW_VERSION ]]; then
             yellow "Update found!"
