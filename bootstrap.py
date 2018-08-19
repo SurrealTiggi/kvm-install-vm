@@ -114,7 +114,6 @@ def validateInventory(instance=None):
     Either follow the expected template, or fail.
 
     TODO:
-    4) Get singular playbook -> Download the relevant playbook and ansible-playbook ansible_scripts/<host>
     5) Setup ~/.ansible.cfg using variables from .kivrc
 
     case = OrderedDict([
@@ -140,6 +139,7 @@ def validateInventory(instance=None):
         private_inv = yaml.load(myinventory)
 
 
+        # TODO: Don't loop...
         # Loop through each inventory key and act accordingly
         # Get the git flag since it's used a few times
         git_enabled = private_inv['git']['enabled']
@@ -157,10 +157,6 @@ def validateInventory(instance=None):
             # If vault is ENABLED, set it up
             if key == 'config' and value_dict['vault']['enabled']:
                 VAULT_PWD = value_dict['vault']['password']
-                if git:
-                    open(HOME + ANSIBLE_GIT + 'vault-pass.txt').write(VAULT_PWD)
-                else:
-                    open(HOME + 'vault-pass.txt').write(VAULT_PWD)
             # If git is DISABLED, fetch defaults and the relevant playbook
             if key == 'config' and not git_enabled:
                 log.debug('Attempting to download defaults.yml')
@@ -173,6 +169,11 @@ def validateInventory(instance=None):
                         log.debug('Attempting to download ' + instance + '.yml')
                         r = requests.get(str(value_dict['location']))
                         open(HOME + instance, 'wb').write(r.content)
+
+            if git_enabled:
+                open(HOME + ANSIBLE_GIT + 'vault-pass.txt').write(VAULT_PWD)
+            else:
+                open(HOME + 'vault-pass.txt').write(VAULT_PWD)
 
         # Create a simple string list of all ansible hostnames
         ANSIBLE_INV = ansibleHelper(vault=VAULT_PWD)
