@@ -75,6 +75,7 @@ function install_deps ()
 function cleanup ()
 {
     ok "Cleaning up"
+    rm -f ./setup.sh
     rm -rf $LIB_DIR/*
     rm -f /usr/sbin/kvm-install-vm
     rm -f /usr/local/bin/bootstrap.py
@@ -94,6 +95,9 @@ function setup ()
     chmod +x /usr/local/bin/bootstrap.py
     ok "Setting up cloud-init template"
     mv /tmp/kvm/cloud.cfg $LIB_DIR/cloud.cfg
+    ok "Setup-ception"
+    mv /tmp/kvm/setup.sh ./setup.sh
+    chmod +x ./setup.sh
     rm -rf /tmp/kvm
 }
 
@@ -120,6 +124,8 @@ case "${subcommand}" in
             yellow "Update found!"
             cleanup
             setup
+            check_pip
+            install_deps
         else
             ok "No updates found"
         fi
