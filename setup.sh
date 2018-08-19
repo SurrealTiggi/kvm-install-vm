@@ -1,6 +1,25 @@
 #!/bin/bash
 set -e
 
+
+#--------------------------------------------------
+# Static variables
+#--------------------------------------------------
+
+# Version used for update checks, updated on each commit, double quotes required because bash...
+VERSION="'0.0.12'"
+
+# Main library directory
+LIB_DIR=/var/lib/kvm-install-vm
+
+# Simple config checker
+NUM_CONFIGS=$(ls -1 $LIB_DIR | grep -v cloud.cfg | wc -l)
+
+# Pip packages
+PIP_PKGS="pyyaml python-dotenv ansible"
+
+
+
 #--------------------------------------------------
 # Installer
 #--------------------------------------------------
@@ -16,12 +35,6 @@ silent() { "$@" > /dev/null 2>&1 ; }
 output() { echo -e "- $@" ; }
 outputn() { echo -en "- $@ ... " ; }
 ok() { green "${@:-OK}" ; }
-
-# Version used for update checks, updated on each commit, double quotes required because bash...
-VERSION="'0.0.12'"
-
-LIB_DIR=/var/lib/kvm-install-vm
-NUM_CONFIGS=$(ls -1 $LIB_DIR | grep -v cloud.cfg | wc -l)
 
 subcommand="${1:-none}"
 [[ "${subcommand}" != "none" ]] && shift
@@ -50,9 +63,12 @@ function check_pip ()
 function install_deps ()
 {
     ok "Installing pip dependencies"
-    pip install pyyaml
-    pip install python-dotenv
-    pip install ansible
+    for pkg in $PIP_PKGS; do
+        if [[ $(pip list | grep -c $pkgs) -ne 1 ]]; then
+            pip install $pkg
+        else
+            yellow "Skipping $pkg as it's already installed..."
+        fi
 }
 
 function cleanup ()
