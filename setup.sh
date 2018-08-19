@@ -17,8 +17,8 @@ output() { echo -e "- $@" ; }
 outputn() { echo -en "- $@ ... " ; }
 ok() { green "${@:-OK}" ; }
 
-# Version used for update checks, updated on each commit
-VERSION='0.0.12'
+# Version used for update checks, updated on each commit, double quotes required because bash...
+VERSION="'0.0.12'"
 
 LIB_DIR=/var/lib/kvm-install-vm
 NUM_CONFIGS=$(ls -1 $LIB_DIR | grep -v cloud.cfg | wc -l)
@@ -97,7 +97,7 @@ case "${subcommand}" in
         # 1) Move .kivrc check from utils lib to here???
         ;;
     --update)
-        NEW_VERSION=$(curl  https://raw.githubusercontent.com/SurrealTiggi/kvm-install-vm/master/setup.sh | grep 'VERSION' | cut -f2 -d'=')
+        NEW_VERSION=$(curl https://raw.githubusercontent.com/SurrealTiggi/kvm-install-vm/master/setup.sh | grep 'VERSION' | head -1 | cut -f2 -d'=')
         ok "Checking for updates..."
         if [[ $VERSION != $NEW_VERSION ]]; then
             yellow "Update found!"
