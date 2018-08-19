@@ -6,8 +6,8 @@ set -e
 # Static variables
 #--------------------------------------------------
 
-# Version used for update checks, updated on each commit, double quotes required because bash...
-VERSION="'0.0.12'"
+# Version used for update checks, updated on each (significant) commit, double quotes required because bash...
+VERSION="'0.0.14'"
 
 # Main library directory
 LIB_DIR=/var/lib/kvm-install-vm
@@ -16,7 +16,7 @@ LIB_DIR=/var/lib/kvm-install-vm
 NUM_CONFIGS=$(ls -1 $LIB_DIR | grep -v cloud.cfg | wc -l)
 
 # Pip packages
-PIP_PKGS="pyyaml python-dotenv ansible"
+PIP_PKGS="pyyaml python-dotenv ansible gitpython"
 
 
 

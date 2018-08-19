@@ -58,4 +58,4 @@ export VERBOSE=0
 #export ORC_SCRIPT="~/bootstrap.py"
 
 # Inventory URL
-#export INV_URL="https://gist.githubusercontent.com/someuser/hash/raw/anotherhash/defaults.yml"
+#export INV_URL=""

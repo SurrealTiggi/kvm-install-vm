@@ -55,11 +55,11 @@ case "${subcommand}" in
             set_defaults
             set_custom_defaults
             "${subcommand}" "$@"
-            if [ ! -z "${ORC_SCRIPT+x}" ]
-            then
-                output "Time to orchestrate!"
-                ./${ORC_SCRIPT} "$@"
-            fi
+            #if [ ! -z "${ORC_SCRIPT}" ]
+            #then
+            #    output "Time to orchestrate!"
+            #    ./${ORC_SCRIPT} --instance="$@"
+            #fi
             exit $?
         fi
         ;;

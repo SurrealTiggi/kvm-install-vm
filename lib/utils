@@ -23,6 +23,8 @@ function customize ()
     read script
     yellow "BOOTSTRAP SCRIPT (bootstrap.py)?: "
     read boot_script
+    yellow "INVENTORY URL (inventory.yml)?: "
+    read inv_url
 
     # Now we just go through each one above and replace accordingly
     if [ ! -z $cpu ]; then
@@ -45,6 +47,9 @@ function customize ()
     fi
     if [ ! -z $boot_script ]; then
         sed  -i "s/#export ORC_SCRIPT=\"~\/bootstrap.py\"/export ORC_SCRIPT=\"~\/${boot_script}\"/g" ${HOME}/.kivrc
+    fi
+    if [ ! -z $inv_url ]; then
+        sed  -i "s/#export INV_URL=\"\"/export INV_URL=\"${inv_url}\"/g" ${HOME}/.kivrc
     fi
 }
 

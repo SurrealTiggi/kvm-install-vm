@@ -1,6 +1,6 @@
 # kvm-install-vm
 
-[![Generic badge](https://img.shields.io/badge/Version-0.0.12-GREEN.svg)](https://shields.io/)
+[![Generic badge](https://img.shields.io/badge/Version-0.0.14-GREEN.svg)](https://shields.io/)
 
 [![N|Solid](https://i.imgur.com/f6CyxB4.png)](https://libvirt.org/)
 
@@ -30,10 +30,12 @@ You need to have the KVM hypervisor installed, along with a few other packages:
 - qemu-img
 - libvirt-client
 - libnss-libvirt
+- git (only if you use bootstrap.py)
 - pip (NB. --install will sort these dependencies out...hopefully)
-  - pyyaml
-  - python-dotenv
-  - ansible
+  - GitPython
+  - PyYaml
+  - Python-DotEnv
+  - Ansible
 
 Then, add `libvirt` and `libvirt_guest` to list of **hosts** databases in
 `/etc/nsswitch.conf`.  See [here](https://libvirt.org/nss.html) for more
