@@ -7,6 +7,9 @@ config:
   defaults:
     description: "Global variables"
     location: "https://gist.githubusercontent.com/someuser/hash/raw/anotherhash/defaults.yml"
+  vault:
+    enabled: true
+    password: 'Thanos was right'
 hosts:
   vm_host1:
     description: "A virtual machine to do stuff with"

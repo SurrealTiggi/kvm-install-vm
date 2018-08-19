@@ -1,6 +1,6 @@
 # kvm-install-vm
 
-[![Generic badge](https://img.shields.io/badge/Version-0.0.14-GREEN.svg)](https://shields.io/)
+[![Generic badge](https://img.shields.io/badge/Version-0.0.15-GREEN.svg)](https://shields.io/)
 
 [![N|Solid](https://i.imgur.com/f6CyxB4.png)](https://libvirt.org/)
 
@@ -36,6 +36,7 @@ You need to have the KVM hypervisor installed, along with a few other packages:
   - PyYaml
   - Python-DotEnv
   - Ansible
+  - Ansible-Vault
 
 Then, add `libvirt` and `libvirt_guest` to list of **hosts** databases in
 `/etc/nsswitch.conf`.  See [here](https://libvirt.org/nss.html) for more
@@ -55,6 +56,7 @@ On every run the script checks that:
 > This file is based on using ansible to manage a small number of VMs, so skip it if you're not using it.
 > The point of this file is in case there are customizations in the ansible playbook that need to be kept private, as well as providing a single file to keep track of all VM's.
 > If you don't want to use it, just keep SCRIPT and ORC_SCRIPT flags blank in your `.kivrc` file.
+> The formatting is pretty strict, not perfect, but strict nonetheless.
 
 - `~/cloud.cfg` cloud-init config exists, else it prompts to reinstall.
 

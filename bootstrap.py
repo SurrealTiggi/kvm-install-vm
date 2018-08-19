@@ -22,24 +22,26 @@ from yaml import load, dump
 from dotenv import load_dotenv
 from ansible.parsing.dataloader import DataLoader
 from ansible.inventory.manager import InventoryManager
-from ansible.vars import VariableManager
+from ansible.vars.manager import VariableManager
 from ansible.executor.playbook_executor import PlaybookExecutor
+from ansible_vault import Vault
 
 # Static variables
 FORMAT = '%(asctime)s -- %(levelname)s -- [ %(filename)s:%(lineno)s - %(funcName)s() ] : %(message)s'
+ANSIBLE_INV = None
+ANSIBLE_GIT = None
+VAULT_PWD = None
 if os.name == 'nt':
     LOGFILE = str(os.getcwd() + '\\bootstrap.log')
     HOME = str(expanduser("~") + '\\')
     ENV_FILE = str(HOME + '.kivrc')
-    ANSIBLE_INV = None
-    ANSIBLE_GIT = None
+    ANSIBLE_HOSTS = None
 
 else:
     LOGFILE = str(os.getcwd() + '/bootstrap.log')
     HOME = str(expanduser("~") + '/')
     ENV_FILE = str(HOME + '.kivrc')
-    ANSIBLE_INV = '/etc/ansible/hosts'
-    ANSIBLE_GIT = None
+    ANSIBLE_HOSTS = '/etc/ansible/hosts'
 
 # Colors for readability
 class Colors:
@@ -52,20 +54,25 @@ class Colors:
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
 
-def ansibleHelper():
+def ansibleHelper(vault=None):
     '''
     Creates the ansible inventory object
     
     TODO: Split out into its own class???
     '''
     data_loader = DataLoader()
-    ansible_inv = InventoryManager(loader = data_loader,
-                                    sources=[ANSIBLE_INV])
-    return ansible_inv
+
+    if vault is not None:
+        data_loader.set_vault_password(vault)
+
+    inv = InventoryManager(loader = data_loader,
+                                    sources=[ANSIBLE_HOSTS])
+    return inv
 
 def ansibleDiff(priv, local):
     '''
     Check for differences between inventory.yml object and ansible inventory object
+    
     TODO: Cleanup missing since it includes entries we don't necessarily want
     TODO: Return True/False depending on actual differences
     '''
@@ -75,6 +82,7 @@ def ansibleDiff(priv, local):
 def updateLocal():
     '''
     Update local inventory to match private inventory
+    TODO: yeah...
     '''
     pass
 
@@ -130,34 +138,45 @@ def validateInventory(instance=None):
         with open(HOME + 'inventory.yml', 'r') as myfile:
             myinventory = myfile.read()
         private_inv = yaml.load(myinventory)
-        ansible_inv = ansibleHelper()
 
-        # Create a simple string list of all ansible hostnames
-        local_inv = [str(i.name) for i in ansible_inv.groups.values()]
 
         # Loop through each inventory key and act accordingly
         # Get the git flag since it's used a few times
         git_enabled = private_inv['git']['enabled']
         for key, value_dict in private_inv.items():
-            print("%s: %s") % (key, value_dict)
             # If git is ENABLED, download git project and we're done
             if key == 'git' and git_enabled:
                 ANSIBLE_GIT = re.findall('/(\w+)?.git$', value_dict['location'])[0]
                 if os.path.exists(HOME + ANSIBLE_GIT):
+                    log.debug('Directory ' + ANSIBLE_GIT + ' exists so updating...')
                     g = git.cmd.Git(HOME + ANSIBLE_GIT)
                     g.pull()
                 else:
+                    log.debug('Directory ' + ANSIBLE_GIT + ' non-existant so pulling...')
                     Repo.clone_from(value_dict['location'], HOME + ANSIBLE_GIT)
+            # If vault is ENABLED, set it up
+            if key == 'config' and value_dict['vault']['enabled']:
+                VAULT_PWD = value_dict['vault']['password']
+                if git:
+                    open(HOME + ANSIBLE_GIT + 'vault-pass.txt').write(VAULT_PWD)
+                else:
+                    open(HOME + 'vault-pass.txt').write(VAULT_PWD)
             # If git is DISABLED, fetch defaults and the relevant playbook
-            elif key == 'config' and not git_enabled:
+            if key == 'config' and not git_enabled:
+                log.debug('Attempting to download defaults.yml')
                 defaults = private_inv['config']['defaults']['location']
                 r = requests.get(str(defaults))
                 open(HOME + 'defaults.yml', 'wb').write(r.content)
-            elif key == 'hosts' and not git_enabled:
+            if key == 'hosts' and not git_enabled:
                 for host, value_dict in private_inv['hosts'].items():
                     if host == instance:
+                        log.debug('Attempting to download ' + instance + '.yml')
                         r = requests.get(str(value_dict['location']))
                         open(HOME + instance, 'wb').write(r.content)
+
+        # Create a simple string list of all ansible hostnames
+        ANSIBLE_INV = ansibleHelper(vault=VAULT_PWD)
+        local_inv = [str(i.name) for i in ANSIBLE_INV.groups.values()]
 
         if ansibleDiff(private_inv, local_inv):
             updateLocal()
@@ -168,11 +187,25 @@ def validateInventory(instance=None):
         sys.exit()
 
 def runAnsible(instance):
-    # TODO: If inv.repo = True then run from inside ansible_scripts directory
-    log.debug('Running with ' + instance)
+    log.debug("Playbooking >> " + instance)
 
+    if ANSIBLE_GIT is not None:
+        playbook_path = HOME + ANSIBLE_GIT + instance + '.yml'
+    else:
+        playbook_path = HOME + instance + '.yml'
+    
+    pbex = PlaybookExecutor(playbooks=playbook_path, inventory=ANSIBLE_INV)
+
+    results = pbex.run()
+    
 def cleanup():
     log.debug('Cleaning up...')
+    try:
+        os.remove(HOME + 'inventory.yml')
+    except OSError as e:
+        log.error('Failed to remove inventory.yml: ' + e)
+        pass
+
 
 def promptUser():
 
@@ -209,12 +242,11 @@ def main(*args, **kwargs):
     parser.add_argument("-i", "--instance", type=str,
                         help="singular instance to configure",
                         default=None)
-    args=parser.parse_args()
+    args, _ = parser.parse_known_args()
 
     validateInventory(instance=args.instance)
 
     if args.instance:
-        log.debug("Playbooking >> " + args.instance)
         runAnsible(args.instance)
     else:
         log.debug("No instance given so just cleaning up")

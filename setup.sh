@@ -7,7 +7,7 @@ set -e
 #--------------------------------------------------
 
 # Version used for update checks, updated on each (significant) commit, double quotes required because bash...
-VERSION="'0.0.14'"
+VERSION="'0.0.15'"
 
 # Main library directory
 LIB_DIR=/var/lib/kvm-install-vm
@@ -16,7 +16,7 @@ LIB_DIR=/var/lib/kvm-install-vm
 NUM_CONFIGS=$(ls -1 $LIB_DIR | grep -v cloud.cfg | wc -l)
 
 # Pip packages
-PIP_PKGS="pyyaml python-dotenv ansible gitpython"
+PIP_PKGS="pyyaml python-dotenv ansible gitpython ansible-vault"
 
 
 
