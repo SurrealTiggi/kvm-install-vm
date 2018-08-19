@@ -26,7 +26,7 @@ from ansible.vars import VariableManager
 from ansible.executor.playbook_executor import PlaybookExecutor
 
 # Static variables
-FORMAT = '%(asctime)s || %(levelname) || [%(filename)s:%(lineno)s - %(funcName)20s() ] : %(message)s'
+FORMAT = '%(asctime)s -- %(levelname)s -- [ %(filename)s:%(lineno)s - %(funcName)s() ] : %(message)s'
 if os.name == 'nt':
     LOGFILE = str(os.getcwd() + '\\bootstrap.log')
     HOME = str(expanduser("~") + '\\')
@@ -137,11 +137,11 @@ def validateInventory(instance=None):
 
         # Loop through each inventory key and act accordingly
         # Get the git flag since it's used a few times
-        git = private_inv['git']['enabled']
+        git_enabled = private_inv['git']['enabled']
         for key, value_dict in private_inv.items():
             print("%s: %s") % (key, value_dict)
             # If git is ENABLED, download git project and we're done
-            if key == 'git' and git:
+            if key == 'git' and git_enabled:
                 ANSIBLE_GIT = re.findall('/(\w+)?.git$', value_dict['location'])[0]
                 if os.path.exists(HOME + ANSIBLE_GIT):
                     g = git.cmd.Git(HOME + ANSIBLE_GIT)
@@ -149,11 +149,11 @@ def validateInventory(instance=None):
                 else:
                     Repo.clone_from(value_dict['location'], HOME + ANSIBLE_GIT)
             # If git is DISABLED, fetch defaults and the relevant playbook
-            elif key == 'config' and not git:
+            elif key == 'config' and not git_enabled:
                 defaults = private_inv['config']['defaults']['location']
                 r = requests.get(str(defaults))
                 open(HOME + 'defaults.yml', 'wb').write(r.content)
-            elif key == 'hosts' and not git:
+            elif key == 'hosts' and not git_enabled:
                 for host, value_dict in private_inv['hosts'].items():
                     if host == instance:
                         r = requests.get(str(value_dict['location']))
@@ -217,9 +217,10 @@ def main(*args, **kwargs):
         log.debug("Playbooking >> " + args.instance)
         runAnsible(args.instance)
     else:
+        log.debug("No instance given so just cleaning up")
         cleanup()
 
 if __name__ == '__main__':
     logging.basicConfig(format=FORMAT, filename=LOGFILE, level=os.environ.get("LOGLEVEL", "DEBUG"))
     log = logging.getLogger(__name__)
-    sys.exit(main(None))
+    sys.exit(main())
