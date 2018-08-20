@@ -31,6 +31,7 @@ from ansible.executor.playbook_executor import PlaybookExecutor
 FORMAT = '%(asctime)s -- %(levelname)s -- [ %(filename)s:%(lineno)s - %(funcName)s() ] : %(message)s'
 ANSIBLE_INV = None
 ANSIBLE_GIT = None
+ANSIBLE_DL = None
 VAULT_PWD = None
 if os.name == 'nt':
     LOGFILE = str(os.getcwd() + '\\bootstrap.log')
@@ -61,12 +62,12 @@ def ansibleHelper(vault=None):
     
     TODO: Split out into its own class???
     '''
-    data_loader = DataLoader()
+    ANSIBLE_DL = DataLoader()
 
     if vault is not None:
-        data_loader.set_vault_secrets(vault)
+        ANSIBLE_DL.set_vault_secrets(vault)
 
-    inv = InventoryManager(loader = data_loader,
+    inv = InventoryManager(loader = ANSIBLE_DL,
                                     sources=[ANSIBLE_HOSTS])
     return inv
 
@@ -199,7 +200,17 @@ def runAnsible(instance):
         playbook_path = HOME + instance + '.yml'
     
     try:
-        pbex = PlaybookExecutor(playbooks=playbook_path, inventory=ANSIBLE_INV)
+        variable_manager = VariableManager()
+        variable_manager.extra_vars = {'hosts': instance} # This can accomodate various other command line arguments.`
+        pbex = PlaybookExecutor(
+            playbooks=[playbook_path],
+            inventory=ANSIBLE_INV,
+            variable_manager=variable_manager,
+            loader=ANSIBLE_DL,
+            options=None,
+            passwords=None)
+        
+        #pbex = PlaybookExecutor(playbooks=playbook_path, inventory=ANSIBLE_INV)
         results = pbex.run()
     except:
         raise IOError('Playbook not found')
@@ -256,7 +267,7 @@ def main(*args, **kwargs):
         try:
             runAnsible(args.instance)
         except Exception as e:
-            log.error('Failed to playbook >> ' + args.instance + ': ' + e)
+            log.error('Failed to playbook >> ' + args.instance + ': ' + str(e))
             log.error(traceback.print_exc())
     else:
         log.debug("No instance given so just cleaning up")
