@@ -62,6 +62,7 @@ def ansibleHelper(vault=None):
     
     TODO: Split out into its own class???
     '''
+    global ANSIBLE_DL
     ANSIBLE_DL = DataLoader()
 
     if vault is not None:
@@ -148,6 +149,7 @@ def validateInventory(instance=None):
         for key, value_dict in private_inv.items():
             # If git is ENABLED, download git project and we're done
             if key == 'git' and git_enabled:
+                global ANSIBLE_GIT
                 ANSIBLE_GIT = str(re.findall('/(\w+)?.git$', value_dict['location'])[0] + '/')
                 if os.path.exists(HOME + ANSIBLE_GIT):
                     log.debug('Directory ' + ANSIBLE_GIT + ' exists so updating...')
@@ -158,6 +160,7 @@ def validateInventory(instance=None):
                     Repo.clone_from(value_dict['location'], HOME + ANSIBLE_GIT)
             # If vault is ENABLED, set it up
             if key == 'config' and value_dict['vault']['enabled']:
+                global VAULT_PWD
                 VAULT_PWD = value_dict['vault']['password']
             # If git is DISABLED, fetch defaults and the relevant playbook
             if key == 'config' and not git_enabled:
@@ -179,6 +182,7 @@ def validateInventory(instance=None):
             open(HOME + 'vault-pass.txt', 'wb').write(VAULT_PWD)
 
         # Create a simple string list of all ansible hostnames
+        global ANSIBLE_INV
         ANSIBLE_INV = ansibleHelper(vault=VAULT_PWD)
         local_inv = [str(i.name) for i in ANSIBLE_INV.groups.values()]
 
