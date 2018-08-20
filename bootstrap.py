@@ -199,21 +199,22 @@ def runAnsible(instance):
     else:
         playbook_path = HOME + instance + '.yml'
     
-    try:
-        variable_manager = VariableManager()
-        variable_manager.extra_vars = {'hosts': instance} # This can accomodate various other command line arguments.`
-        pbex = PlaybookExecutor(
-            playbooks=[playbook_path],
-            inventory=ANSIBLE_INV,
-            variable_manager=variable_manager,
-            loader=ANSIBLE_DL,
-            options=None,
-            passwords=None)
-        
-        #pbex = PlaybookExecutor(playbooks=playbook_path, inventory=ANSIBLE_INV)
-        results = pbex.run()
-    except:
+    if not os.path.exists(playbook_path):
         raise IOError('Playbook not found')
+    
+    variable_manager = VariableManager()
+    variable_manager.extra_vars = {'hosts': instance} # This can accomodate various other command line arguments.`
+    pbex = PlaybookExecutor(
+        playbooks=[playbook_path],
+        inventory=ANSIBLE_INV,
+        variable_manager=variable_manager,
+        loader=ANSIBLE_DL,
+        options=None,
+        passwords=None)
+    
+    #pbex = PlaybookExecutor(playbooks=playbook_path, inventory=ANSIBLE_INV)
+    results = pbex.run()
+    
     
 def cleanup():
     log.debug('Cleaning up...')
