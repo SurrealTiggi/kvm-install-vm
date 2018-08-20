@@ -24,7 +24,7 @@ from yaml import load, dump
 from dotenv import load_dotenv
 from ansible.parsing.dataloader import DataLoader
 from ansible.inventory.manager import InventoryManager
-#from ansible_vault import Vault
+from ansible_subprocess import run_playbook, run_ping
 
 # Static variables
 FORMAT = '%(asctime)s -- %(levelname)s -- [ %(filename)s:%(lineno)s - %(funcName)s() ] : %(message)s'
@@ -202,19 +202,22 @@ def runAnsible(instance):
     if not os.path.exists(playbook_path):
         raise IOError('Playbook not found')
     
+    # TODO: tidy this up to cater for no ANSIBLE_GIT and no VAULT
     if VAULT_PWD is not None:
-        runner = "ansible-playbook --vault-id %s %s" % (
-            HOME + ANSIBLE_GIT + 'vault-pass.txt',
-            playbook_path)
-    else:
-        runner = "ansible-playbook %s" % ( playbook_path )
-    bashing(runner)
-    
+        vault_loc = HOME + ANSIBLE_GIT + 'vault-pass.txt'
+
+    status, stdout, stderr = run_playbook(
+                                playbook_path,
+                                instance,
+                                extra_options=['--vault-id', vault_loc]
+                                )
+    log.debug(str(status) + str(stdout) + str(stderr))    
 
 def bashing(cmd):
     '''
     Subprocess to run ansible commands directly because reasons
     '''
+    log.debug("Running with " + str(cmd))
     process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
     output = process.stdout.readline()
     log.debug(output)
@@ -270,6 +273,7 @@ def main(*args, **kwargs):
     if args.instance:
         try:
             runAnsible(args.instance)
+            cleanup()
         except Exception as e:
             log.error('Failed to playbook >> ' + args.instance + ': ' + str(e))
             log.error(traceback.print_exc())
