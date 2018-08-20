@@ -24,7 +24,7 @@ from yaml import load, dump
 from dotenv import load_dotenv
 from ansible.parsing.dataloader import DataLoader
 from ansible.inventory.manager import InventoryManager
-from ansible_subprocess import run_playbook, run_ping
+from ansible_subprocess import run_playbook
 
 # Static variables
 FORMAT = '%(asctime)s -- %(levelname)s -- [ %(filename)s:%(lineno)s - %(funcName)s() ] : %(message)s'
@@ -134,8 +134,6 @@ def validateInventory(instance=None):
             myinventory = myfile.read()
         private_inv = yaml.load(myinventory)
 
-
-        # TODO: Don't loop...
         # Loop through each inventory key and act accordingly
         # Get the git flag since it's used a few times
         git_enabled = private_inv['git']['enabled']
@@ -208,10 +206,11 @@ def runAnsible(instance):
 
     status, stdout, stderr = run_playbook(
                                 playbook_path,
-                                instance,
+                                [instance],
                                 extra_options=['--vault-id', vault_loc]
                                 )
-    log.debug(str(status) + str(stdout) + str(stderr))    
+    print(str(stdout))
+    log.debug(str(status) + str(stderr))    
 
 def bashing(cmd):
     '''
