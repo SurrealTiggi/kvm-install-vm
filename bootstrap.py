@@ -13,6 +13,7 @@ from os.path import expanduser
 import requests
 import re
 import argparse
+import traceback
 from collections import OrderedDict
 
 import git
@@ -185,6 +186,7 @@ def validateInventory(instance=None):
 
     except Exception as e:
         log.error('Failed to process inventory.yml file: ' + str(e))
+        traceback.print_tb(e.__traceback__)
         print(Colors.FAIL + 'Unable to continue as your inventory file is un-readable. Please check it and re-run this script.')
         sys.exit()
 
