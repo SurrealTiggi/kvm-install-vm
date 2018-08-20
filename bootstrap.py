@@ -173,9 +173,9 @@ def validateInventory(instance=None):
 
         # Not super happy with this being here, need to fix
         if git_enabled:
-            open(HOME + ANSIBLE_GIT + 'vault-pass.txt').write(VAULT_PWD)
+            open(HOME + ANSIBLE_GIT + 'vault-pass.txt', 'wb').write(VAULT_PWD)
         else:
-            open(HOME + 'vault-pass.txt').write(VAULT_PWD)
+            open(HOME + 'vault-pass.txt', 'wb').write(VAULT_PWD)
 
         # Create a simple string list of all ansible hostnames
         ANSIBLE_INV = ansibleHelper(vault=VAULT_PWD)
@@ -186,7 +186,7 @@ def validateInventory(instance=None):
 
     except Exception as e:
         log.error('Failed to process inventory.yml file: ' + str(e))
-        traceback.print_tb(e.__traceback__)
+        log.error(traceback.print_exc())
         print(Colors.FAIL + 'Unable to continue as your inventory file is un-readable. Please check it and re-run this script.')
         sys.exit()
 
