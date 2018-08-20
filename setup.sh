@@ -16,7 +16,7 @@ LIB_DIR=/var/lib/kvm-install-vm
 NUM_CONFIGS=$(ls -1 $LIB_DIR | grep -v cloud.cfg | wc -l)
 
 # Pip packages
-PIP_PKGS="pyyaml python-dotenv ansible gitpython ansible-vault"
+PIP_PKGS="pyyaml python-dotenv ansible gitpython"
 
 
 

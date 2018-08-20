@@ -24,7 +24,7 @@ from ansible.parsing.dataloader import DataLoader
 from ansible.inventory.manager import InventoryManager
 from ansible.vars.manager import VariableManager
 from ansible.executor.playbook_executor import PlaybookExecutor
-from ansible_vault import Vault
+#from ansible_vault import Vault
 
 # Static variables
 FORMAT = '%(asctime)s -- %(levelname)s -- [ %(filename)s:%(lineno)s - %(funcName)s() ] : %(message)s'
@@ -146,7 +146,7 @@ def validateInventory(instance=None):
         for key, value_dict in private_inv.items():
             # If git is ENABLED, download git project and we're done
             if key == 'git' and git_enabled:
-                ANSIBLE_GIT = re.findall('/(\w+)?.git$', value_dict['location'])[0]
+                ANSIBLE_GIT = str(re.findall('/(\w+)?.git$', value_dict['location'])[0] + '/')
                 if os.path.exists(HOME + ANSIBLE_GIT):
                     log.debug('Directory ' + ANSIBLE_GIT + ' exists so updating...')
                     g = git.cmd.Git(HOME + ANSIBLE_GIT)
@@ -170,10 +170,11 @@ def validateInventory(instance=None):
                         r = requests.get(str(value_dict['location']))
                         open(HOME + instance, 'wb').write(r.content)
 
-            if git_enabled:
-                open(HOME + ANSIBLE_GIT + 'vault-pass.txt').write(VAULT_PWD)
-            else:
-                open(HOME + 'vault-pass.txt').write(VAULT_PWD)
+        # Not super happy with this being here, need to fix
+        if git_enabled:
+            open(HOME + ANSIBLE_GIT + 'vault-pass.txt').write(VAULT_PWD)
+        else:
+            open(HOME + 'vault-pass.txt').write(VAULT_PWD)
 
         # Create a simple string list of all ansible hostnames
         ANSIBLE_INV = ansibleHelper(vault=VAULT_PWD)

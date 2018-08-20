@@ -36,7 +36,6 @@ You need to have the KVM hypervisor installed, along with a few other packages:
   - PyYaml
   - Python-DotEnv
   - Ansible
-  - Ansible-Vault
 
 Then, add `libvirt` and `libvirt_guest` to list of **hosts** databases in
 `/etc/nsswitch.conf`.  See [here](https://libvirt.org/nss.html) for more
