@@ -64,7 +64,7 @@ def ansibleHelper(vault=None):
     data_loader = DataLoader()
 
     if vault is not None:
-        data_loader.set_vault_password(vault)
+        data_loader.set_vault_secrets(vault)
 
     inv = InventoryManager(loader = data_loader,
                                     sources=[ANSIBLE_HOSTS])
@@ -198,9 +198,11 @@ def runAnsible(instance):
     else:
         playbook_path = HOME + instance + '.yml'
     
-    pbex = PlaybookExecutor(playbooks=playbook_path, inventory=ANSIBLE_INV)
-
-    results = pbex.run()
+    try:
+        pbex = PlaybookExecutor(playbooks=playbook_path, inventory=ANSIBLE_INV)
+        results = pbex.run()
+    except:
+        raise IOError('Playbook not found')
     
 def cleanup():
     log.debug('Cleaning up...')
@@ -251,7 +253,11 @@ def main(*args, **kwargs):
     validateInventory(instance=args.instance)
 
     if args.instance:
-        runAnsible(args.instance)
+        try:
+            runAnsible(args.instance)
+        except Exception as e:
+            log.error('Failed to playbook >> ' + args.instance + ': ' + e)
+            log.error(traceback.print_exc())
     else:
         log.debug("No instance given so just cleaning up")
         cleanup()

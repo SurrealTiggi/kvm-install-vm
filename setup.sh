@@ -7,7 +7,7 @@ set -e
 #--------------------------------------------------
 
 # Version used for update checks, updated on each (significant) commit, double quotes required because bash...
-VERSION="'0.0.15'"
+VERSION="'0.0.16'"
 
 # Main library directory
 LIB_DIR=/var/lib/kvm-install-vm
