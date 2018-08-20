@@ -15,6 +15,7 @@ import re
 import argparse
 import traceback
 from collections import OrderedDict
+import subprocess
 
 import git
 from git import Repo
@@ -23,8 +24,6 @@ from yaml import load, dump
 from dotenv import load_dotenv
 from ansible.parsing.dataloader import DataLoader
 from ansible.inventory.manager import InventoryManager
-from ansible.vars.manager import VariableManager
-from ansible.executor.playbook_executor import PlaybookExecutor
 #from ansible_vault import Vault
 
 # Static variables
@@ -33,17 +32,11 @@ ANSIBLE_INV = None
 ANSIBLE_GIT = None
 ANSIBLE_DL = None
 VAULT_PWD = None
-if os.name == 'nt':
-    LOGFILE = str(os.getcwd() + '\\bootstrap.log')
-    HOME = str(expanduser("~") + '\\')
-    ENV_FILE = str(HOME + '.kivrc')
-    ANSIBLE_HOSTS = None
 
-else:
-    LOGFILE = str(os.getcwd() + '/bootstrap.log')
-    HOME = str(expanduser("~") + '/')
-    ENV_FILE = str(HOME + '.kivrc')
-    ANSIBLE_HOSTS = '/etc/ansible/hosts'
+LOGFILE = str(os.getcwd() + '/bootstrap.log')
+HOME = str(expanduser("~") + '/')
+ENV_FILE = str(HOME + '.kivrc')
+ANSIBLE_HOSTS = '/etc/ansible/hosts'
 
 # Colors for readability
 class Colors:
@@ -183,7 +176,10 @@ def validateInventory(instance=None):
 
         # Create a simple string list of all ansible hostnames
         global ANSIBLE_INV
-        ANSIBLE_INV = ansibleHelper(vault=VAULT_PWD)
+        if VAULT_PWD is not None:
+            ANSIBLE_INV = ansibleHelper(vault=VAULT_PWD)
+        else:
+            ANSIBLE_INV = ansibleHelper()
         local_inv = [str(i.name) for i in ANSIBLE_INV.groups.values()]
 
         if ansibleDiff(private_inv, local_inv):
@@ -206,19 +202,22 @@ def runAnsible(instance):
     if not os.path.exists(playbook_path):
         raise IOError('Playbook not found')
     
-    variable_manager = VariableManager()
-    variable_manager.extra_vars = {'hosts': instance} # This can accomodate various other command line arguments.`
-    pbex = PlaybookExecutor(
-        playbooks=[playbook_path],
-        inventory=ANSIBLE_INV,
-        variable_manager=variable_manager,
-        loader=ANSIBLE_DL,
-        options=None,
-        passwords=None)
+    if VAULT_PWD is not None:
+        runner = "ansible-playbook --vault-id %s %s" % (
+            HOME + ANSIBLE_GIT + 'vault-pass.txt',
+            playbook_path)
+    else:
+        runner = "ansible-playbook %s" % ( playbook_path )
+    bashing(runner)
     
-    #pbex = PlaybookExecutor(playbooks=playbook_path, inventory=ANSIBLE_INV)
-    results = pbex.run()
-    
+
+def bashing(cmd):
+    '''
+    Subprocess to run ansible commands directly because reasons
+    '''
+    process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
+    output = process.stdout.readline()
+    log.debug(output)
     
 def cleanup():
     log.debug('Cleaning up...')
