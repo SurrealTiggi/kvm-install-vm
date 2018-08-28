@@ -16,7 +16,7 @@ LIB_DIR=/var/lib/kvm-install-vm
 NUM_CONFIGS=$(ls -1 $LIB_DIR | grep -v cloud.cfg | wc -l)
 
 # Pip packages
-PIP_PKGS="pyyaml python-dotenv ansible gitpython ansible-subprocess"
+PIP_PKGS="PyYAML python-dotenv ansible GitPython ansible-subprocess"
 
 
 
@@ -64,7 +64,7 @@ function install_deps ()
 {
     ok "Installing pip dependencies"
     for pkg in $PIP_PKGS; do
-        if [ $(pip list | grep -ic $pkg) -ne 1 ]; then
+        if [ $(pip list | grep -wc $pkg) -ne 1 ]; then
             pip install $pkg
         else
             yellow "Skipping $pkg as it's already installed..."
@@ -100,6 +100,15 @@ function setup ()
     rm -rf /tmp/kvm
 }
 
+function main()
+{
+    echo "This is a main function placeholder"
+}
+
+if [ "${1}" != "--source-only" ]; then
+        main "${@}"
+fi
+
 case "${subcommand}" in
     --install)
         if [ ! -d "$LIB_DIR" ] || [ $NUM_CONFIGS -lt 6 ]; then
@@ -124,6 +133,7 @@ case "${subcommand}" in
             cleanup
             setup
             check_pip
+            . setup.sh --source-only
             install_deps
         else
             ok "No updates found"
