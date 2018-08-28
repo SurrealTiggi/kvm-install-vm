@@ -64,7 +64,7 @@ function install_deps ()
 {
     ok "Installing pip dependencies"
     for pkg in $PIP_PKGS; do
-        if [ $(pip list | grep -wc $pkg) -ne 1 ]; then
+        if [ $(pip list | grep -i $pkg | head -1 | wc -l) -ne 1 ]; then
             pip install $pkg
         else
             yellow "Skipping $pkg as it's already installed..."
