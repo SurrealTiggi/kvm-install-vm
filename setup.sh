@@ -100,47 +100,44 @@ function setup ()
     rm -rf /tmp/kvm
 }
 
-function main()
-{
-    case "${subcommand}" in
-        --install)
-            if [ ! -d "$LIB_DIR" ] || [ $NUM_CONFIGS -lt 6 ]; then
-                mkdir -p $LIB_DIR
-                cleanup
-                setup
-            else
-                ok "Libraries found so continuing..."
-            fi
 
-            check_pip
-            install_deps
-            ok "DONE!"
-            # TODO: 
-            # 1) Move .kivrc check from utils lib to here???
-            ;;
-        --update)
-            NEW_VERSION=$(curl https://raw.githubusercontent.com/SurrealTiggi/kvm-install-vm/master/setup.sh | grep 'VERSION' | head -1 | cut -f2 -d'=' | sed -e 's/\"//g')
-            ok "Checking for updates..."
-            if [[ $VERSION != $NEW_VERSION ]]; then
-                yellow "Update found!"
-                cleanup
-                setup
-                check_pip
-                . setup.sh --source-only
-                install_deps
-            else
-                ok "No updates found"
-            fi
-            ;;
-        --remove)
+case "${subcommand}" in
+    --source-only)
+        ok "Import only"
+        ;;
+    --install)
+        if [ ! -d "$LIB_DIR" ] || [ $NUM_CONFIGS -lt 6 ]; then
+            mkdir -p $LIB_DIR
             cleanup
-            ;;
-        *)
-            die "'${subcommand}' is not a valid subcommand.  Usage: ./setup.sh --install|--update|--remove."
-            ;;
-    esac
-}
+            setup
+        else
+            ok "Libraries found so continuing..."
+        fi
 
-if [ "${1}" != "--source-only" ]; then
-        main "${@}"
-fi
+        check_pip
+        install_deps
+        ok "DONE!"
+        # TODO: 
+        # 1) Move .kivrc check from utils lib to here???
+        ;;
+    --update)
+        NEW_VERSION=$(curl https://raw.githubusercontent.com/SurrealTiggi/kvm-install-vm/master/setup.sh | grep 'VERSION' | head -1 | cut -f2 -d'=' | sed -e 's/\"//g')
+        ok "Checking for updates..."
+        if [[ $VERSION != $NEW_VERSION ]]; then
+            yellow "Update found!"
+            cleanup
+            setup
+            check_pip
+            . setup.sh --source-only
+            install_deps
+        else
+            ok "No updates found"
+        fi
+        ;;
+    --remove)
+        cleanup
+        ;;
+    *)
+        die "'${subcommand}' is not a valid subcommand.  Usage: ./setup.sh --install|--update|--remove."
+        ;;
+esac
