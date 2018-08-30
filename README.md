@@ -1,6 +1,6 @@
 # kvm-install-vm
 
-[![Generic badge](https://img.shields.io/badge/Version-0.0.17-GREEN.svg)](https://shields.io/)
+[![Generic badge](https://img.shields.io/badge/Version-0.0.17-LIGHTGREEN.svg)](https://shields.io/)
 
 [![N|Solid](https://i.imgur.com/f6CyxB4.png)](https://libvirt.org/)
 
