@@ -2,7 +2,7 @@
 
 [![Generic badge](https://img.shields.io/badge/Version-0.0.17-LIGHTGREEN.svg)](https://shields.io/)
 
-[![N|Solid](https://i.imgur.com/f6CyxB4.png)](https://libvirt.org/)
+[![Generic badge](https://img.shields.io/badge/Powered%20By-libvirtd-LIGHTPURPLE.svg)](https://libvirt.org/)
 
 A bash wrapper around virt-install to build virtual machines on a local KVM
 hypervisor.  You can run it as a normal user which will use `qemu:///session` to
