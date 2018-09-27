@@ -24,6 +24,7 @@ connect locally to your KVM domains.
 
 You need to have the KVM hypervisor installed, along with a few other packages:
 
+- A correctly configured bridge (eg. br0)
 - genisoimage or mkisofs
 - virt-install
 - libguestfs-tools
@@ -44,7 +45,7 @@ information.
 
 ## Installation
 
-Trying to go for a simpler approach, basically you should just need to download [setup.sh](https://raw.githubusercontent.com/SurrealTiggi/kvm-install-vm/master/setup.sh), `chmod +x install.sh`, and then `./setup.sh --install`.
+Trying to go for a simpler approach, basically you should just need to download [setup.sh](https://raw.githubusercontent.com/SurrealTiggi/kvm-install-vm/master/setup.sh), `chmod +x setup.sh`, and then `./setup.sh --install`.
 
 On every run the script checks that:
 
@@ -58,7 +59,7 @@ On every run the script checks that:
 > If you don't want to use it, just keep SCRIPT and ORC_SCRIPT flags blank in your `.kivrc` file.
 > The formatting is pretty strict, not perfect, but strict nonetheless.
 
-- `~/cloud.cfg` cloud-init config exists, else it prompts to reinstall.
+- `${LIB_DIR}/cloud.cfg` cloud-init config exists, else it prompts to reinstall.
 
 ### Usage
 
